@@ -1,0 +1,180 @@
+--- a/nvidia-uvm/uvm_mmu.h
++++ b/nvidia-uvm/uvm_mmu.h
+@@ -116,6 +116,9 @@
+     uvm_gpu_phys_address_t addr;
+ 
+     NvU64 size;
++
++    // Non-NULL only for opt-in packed sysmem leaf tables.
++    struct uvm_mmu_sysmem_pool_page *sysmem_pool_page;
+ 
+     union
+     {
+@@ -258,6 +261,9 @@
+ struct uvm_page_tree_struct
+ {
+     uvm_mutex_t lock;
++    // Leaf lock: never held across allocation, DMA mapping or tracker waits.
++    spinlock_t sysmem_pool_lock;
++    struct list_head sysmem_pool_available;
+     uvm_gpu_t *gpu;
+     uvm_page_directory_t *root;
+     uvm_mmu_mode_hal_t *hal;
+--- a/nvidia-uvm/uvm_mmu.c
++++ b/nvidia-uvm/uvm_mmu.c
+@@ -38,6 +38,7 @@
+ 
+ #include <asm/io.h>
+ #include <linux/mm.h>
++#include <linux/dma-map-ops.h>
+ 
+ // The page tree has 6 levels on Hopper+ GPUs, and the root is never freed by a
+ // normal 'put' operation which leaves a maximum of 5 levels.
+@@ -74,6 +75,24 @@
+ MODULE_PARM_DESC(uvm_page_table_location,
+                 "Set the location for UVM-allocated page tables. Choices are: vid, sys.");
+ 
++// Experiment: retain the original DMA mapping per CPU page, but give each
++// small user leaf table a separate 4 KiB slot. Roots and other table sizes
++// retain their original allocation. Disabled by default and inert on 4 KiB.
++static bool uvm_pack_sysmem_leaf_tables;
++module_param(uvm_pack_sysmem_leaf_tables, bool, S_IRUGO);
++MODULE_PARM_DESC(uvm_pack_sysmem_leaf_tables,
++                "Pack 256-byte user leaf tables on coherent integrated 64 KiB systems");
++
++#define UVM_SYSMEM_TABLE_SLOT_SIZE 4096
++#define UVM_SYSMEM_TABLE_SLOT_COUNT (PAGE_SIZE / UVM_SYSMEM_TABLE_SLOT_SIZE)
++
++struct uvm_mmu_sysmem_pool_page
++{
++    struct list_head available;
++    unsigned long used;
++    uvm_mmu_page_table_alloc_t backing;
++};
++
+ NV_STATUS uvm_mmu_init(void)
+ {
+     UVM_ASSERT((page_table_aperture == UVM_APERTURE_VID) ||
+@@ -100,7 +119,7 @@
+     return NV_OK;
+ }
+ 
+-static NV_STATUS phys_mem_allocate_sysmem(uvm_page_tree_t *tree, NvLength size, uvm_mmu_page_table_alloc_t *out)
++static NV_STATUS phys_mem_allocate_sysmem_full_page(uvm_page_tree_t *tree, NvLength size, uvm_mmu_page_table_alloc_t *out)
+ {
+     NV_STATUS status = NV_OK;
+     NvU64 dma_addr;
+@@ -151,6 +170,66 @@
+     return NV_OK;
+ }
+ 
++static NV_STATUS phys_mem_allocate_sysmem(uvm_page_tree_t *tree,
++                                         NvLength size,
++                                         uvm_mmu_page_table_alloc_t *out)
++{
++    struct uvm_mmu_sysmem_pool_page *pool;
++    unsigned long slot;
++    NV_STATUS status;
++    void *cpu;
++
++    // Keep the experiment away from non-coherent DMA, fake GPUs, roots,
++    // kernel trees and platforms with different base-page geometry.
++    if (!uvm_pack_sysmem_leaf_tables || PAGE_SIZE != 65536 || size != 256 ||
++        tree->type != UVM_PAGE_TREE_TYPE_USER || !tree->gpu->parent->pci_dev ||
++        !tree->gpu->parent->is_integrated_gpu || tree->gpu->mem_info.size ||
++        !dev_is_dma_coherent(&tree->gpu->parent->pci_dev->dev))
++        return phys_mem_allocate_sysmem_full_page(tree, size, out);
++
++    spin_lock(&tree->sysmem_pool_lock);
++    if (!list_empty(&tree->sysmem_pool_available)) {
++        pool = list_first_entry(&tree->sysmem_pool_available,
++                                struct uvm_mmu_sysmem_pool_page, available);
++        slot = find_first_zero_bit(&pool->used, UVM_SYSMEM_TABLE_SLOT_COUNT);
++        UVM_ASSERT(slot < UVM_SYSMEM_TABLE_SLOT_COUNT);
++        __set_bit(slot, &pool->used);
++        if (bitmap_full(&pool->used, UVM_SYSMEM_TABLE_SLOT_COUNT))
++            list_del_init(&pool->available);
++        spin_unlock(&tree->sysmem_pool_lock);
++    }
++    else {
++        spin_unlock(&tree->sysmem_pool_lock);
++        pool = kzalloc(sizeof(*pool), NV_UVM_GFP_FLAGS);
++        if (!pool)
++            return NV_ERR_NO_MEMORY;
++
++        // This retains the existing memcg charge, DMA address translation,
++        // physical TLB invalidation and mapped_cpu_pages_size accounting.
++        status = phys_mem_allocate_sysmem_full_page(tree, PAGE_SIZE, &pool->backing);
++        if (status != NV_OK) {
++            kfree(pool);
++            return status;
++        }
++        INIT_LIST_HEAD(&pool->available);
++        slot = 0;
++        __set_bit(slot, &pool->used);
++        spin_lock(&tree->sysmem_pool_lock);
++        list_add(&pool->available, &tree->sysmem_pool_available);
++        spin_unlock(&tree->sysmem_pool_lock);
++    }
++
++    *out = pool->backing;
++    out->size = size;
++    out->sysmem_pool_page = pool;
++    out->addr.address += slot * UVM_SYSMEM_TABLE_SLOT_SIZE;
++    // No slot shares CPU cache lines. Coherent DMA is required above.
++    cpu = kmap(out->handle.page);
++    memset((char *)cpu + slot * UVM_SYSMEM_TABLE_SLOT_SIZE, 0, UVM_SYSMEM_TABLE_SLOT_SIZE);
++    kunmap(out->handle.page);
++    return NV_OK;
++}
++
+ // The aperture may filter the biggest page size:
+ // - UVM_APERTURE_VID                    biggest page size on vidmem mappings
+ // - UVM_APERTURE_SYS                    biggest page size on sysmem mappings
+@@ -238,6 +317,29 @@
+         UVM_ASSERT(status == uvm_global_get_status());
+ 
+     UVM_ASSERT(ptr->addr.aperture == UVM_APERTURE_SYS);
++    if (ptr->sysmem_pool_page) {
++        struct uvm_mmu_sysmem_pool_page *pool = ptr->sysmem_pool_page;
++        unsigned long slot = (ptr->addr.address - pool->backing.addr.address) / UVM_SYSMEM_TABLE_SLOT_SIZE;
++        bool empty;
++
++        // The existing tracker wait above precedes reuse of any slot.
++        spin_lock(&tree->sysmem_pool_lock);
++        UVM_ASSERT(slot < UVM_SYSMEM_TABLE_SLOT_COUNT && test_bit(slot, &pool->used));
++        if (bitmap_full(&pool->used, UVM_SYSMEM_TABLE_SLOT_COUNT))
++            list_add(&pool->available, &tree->sysmem_pool_available);
++        __clear_bit(slot, &pool->used);
++        empty = bitmap_empty(&pool->used, UVM_SYSMEM_TABLE_SLOT_COUNT);
++        if (empty)
++            list_del_init(&pool->available);
++        spin_unlock(&tree->sysmem_pool_lock);
++
++        if (empty) {
++            uvm_parent_gpu_unmap_cpu_pages(tree->gpu->parent, pool->backing.addr.address, PAGE_SIZE);
++            __free_pages(pool->backing.handle.page, 0);
++            kfree(pool);
++        }
++        return;
++    }
+     if (tree->gpu->parent->pci_dev)
+         uvm_parent_gpu_unmap_cpu_pages(tree->gpu->parent, ptr->addr.address, UVM_PAGE_ALIGN_UP(ptr->size));
+     __free_pages(ptr->handle.page, get_order(ptr->size));
+@@ -1146,6 +1248,8 @@
+ 
+     memset(tree, 0, sizeof(*tree));
+     uvm_mutex_init(&tree->lock, UVM_LOCK_ORDER_PAGE_TREE);
++    spin_lock_init(&tree->sysmem_pool_lock);
++    INIT_LIST_HEAD(&tree->sysmem_pool_available);
+     tree->hal = gpu->parent->arch_hal->mmu_mode_hal();
+     UVM_ASSERT(tree->hal != NULL);
+     UVM_ASSERT(MAX_OPERATION_DEPTH >= tree->hal->page_table_depth(UVM_PAGE_SIZE_AGNOSTIC));
+@@ -1239,6 +1343,7 @@
+ 
+     uvm_mutex_unlock(&tree->lock);
+ 
++    UVM_ASSERT(list_empty(&tree->sysmem_pool_available));
+     uvm_tracker_deinit(&tree->tracker);
+     uvm_kvfree(tree->root);
+ }

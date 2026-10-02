@@ -10,12 +10,12 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-WORK = ROOT / '.work' / 'nvidia-580.178.04-uvm-pool'
+WORK = ROOT / '.work' / 'nvidia-610.57.04-uvm-pool'
 MANIFEST = json.loads((ROOT / 'provenance.json').read_text())
 SOURCE = Path(MANIFEST['upstream']['source_root'])
 KERNEL = MANIFEST['tested_kernel']
 DRIVER = MANIFEST['upstream']['tag']
-MODULE_PACKAGE = 'linux-modules-nvidia-580-open-' + KERNEL
+MODULE_PACKAGE = 'linux-modules-nvidia-610-open-' + KERNEL
 MODULE_PACKAGE_VERSION = '7.0.0-1019.19~24.04.2+1'
 BOOT = Path('/boot')
 
@@ -88,7 +88,7 @@ def build(kernel, headers, dkms=False):
     WORK.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(SOURCE, WORK, symlinks=True)
     run('patch', '-d', str(WORK), '-p1', '--fuzz=0', '--batch', '-i',
-        str(ROOT / 'patches/0001-pack-user-leaf-tables.patch'))
+        str(ROOT / 'patches/0002-pack-user-leaf-tables-610.patch'))
     if dkms:
         # Installing this package is the persistent opt-in; stock modules get no
         # global modprobe option. Allocator predicates and a =0 override remain.

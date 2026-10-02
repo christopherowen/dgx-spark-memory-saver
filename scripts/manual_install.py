@@ -96,7 +96,7 @@ def install(module, allow_unsigned=False):
     driver.require((driver.BOOT / ('initrd.img-' + driver.KERNEL)).is_file(),
                    'Target initramfs is missing; complete kernel setup first.')
     receipt = validate_artifact(module, allow_unsigned)
-    receipt.update(state='installing', method='manual', package_version='0.2.0',
+    receipt.update(state='installing', method='manual', package_version='0.3.0',
                    destination=str(DESTINATION))
     # Journal first: removal can recover even if copying or initramfs refresh fails.
     save_receipt(receipt)

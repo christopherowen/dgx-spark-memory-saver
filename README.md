@@ -1,5 +1,11 @@
 # DGX Spark Memory Saver
 
+**R610 qualification branch:** package 0.3.0 targets NVIDIA 610.57.04.
+Hardware validation is pending. The performance and installation evidence below
+belongs to the released 580.178.04 / 0.2.0 implementation. Use
+[the R610 port notes](docs/driver-610.md) for this branch; the other installation
+guides describe the released R580 package.
+
 **Recover memory lost to GPU page tables on a 64 KiB DGX Spark kernel.**
 
 **Experimental, opt-in driver patch.** Tested on GB10 with NVIDIA 580.178.04 and

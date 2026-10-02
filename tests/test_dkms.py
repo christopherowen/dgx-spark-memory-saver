@@ -91,7 +91,7 @@ class BuildChecks(unittest.TestCase):
             self.calls.clear()
             driver.build(driver.KERNEL, self.headers, dkms=dkms)
             applied = [Path(c[-1]).name for c in self.calls if c[0] == 'patch']
-            self.assertEqual(applied, ['0001-pack-user-leaf-tables.patch'] +
+            self.assertEqual(applied, ['0002-pack-user-leaf-tables-610.patch'] +
                              (['enable-packing.patch'] if dkms else []))
             self.assertEqual(before, {p: p.read_bytes() for p in before})
             driver.clean()
@@ -149,7 +149,7 @@ class BuildChecks(unittest.TestCase):
             driver.check_install(driver.KERNEL, self.headers)
 
     def test_competing_nvidia_dkms_is_rejected(self):
-        self.overrides[('dkms', 'status')] = 'nvidia/580.178.04, kernel, aarch64: installed'
+        self.overrides[('dkms', 'status')] = 'nvidia/610.57.04, kernel, aarch64: installed'
         with self.assertRaisesRegex(RuntimeError, 'NVIDIA DKMS'):
             driver.check_install(driver.KERNEL, self.headers)
 
@@ -190,7 +190,7 @@ source ./dkms.conf
 printf '%s\\n' "$PACKAGE_NAME" "$PACKAGE_VERSION" "${#BUILT_MODULE_NAME[@]}" "${BUILT_MODULE_NAME[0]}" "$AUTOINSTALL" "$BUILD_EXCLUSIVE_KERNEL" "$BUILD_EXCLUSIVE_ARCH" "$PRE_INSTALL" "$POST_INSTALL" "$POST_REMOVE"
 '''
         values = subprocess.check_output(['bash', '-c', shell], cwd=ROOT, text=True).splitlines()
-        self.assertEqual(values[:5], ['dgx-spark-memory-saver', '0.2.0', '1', 'nvidia-uvm', 'yes'])
+        self.assertEqual(values[:5], ['dgx-spark-memory-saver', '0.3.0', '1', 'nvidia-uvm', 'yes'])
         self.assertRegex(driver.KERNEL, values[5])
         self.assertIsNone(re.fullmatch(values[5], '7.0.0-1019-nvidia'))
         self.assertIsNone(re.fullmatch(values[5], '7.0.0-1020-nvidia-64k'))
