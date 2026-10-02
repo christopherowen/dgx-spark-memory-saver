@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "package_version": "0.4.0",
+  "default_kernel": "7.0.0-1019-nvidia-64k",
+  "kernels": {
+    "7.0.0-1019-nvidia-64k": {
+      "compiler": "gcc-13"
+    }
+  },
+  "drivers": {
+    "580.178.04": {
+      "manifest": "provenance.json",
+      "patch": "patches/0001-pack-user-leaf-tables.patch",
+      "patch_sha256": "33d9906c91be277de4ad74632b0dd5b87dab24e62256dcf382008e2551740319",
+      "kernels": {
+        "7.0.0-1019-nvidia-64k": {
+          "module_package_version": "7.0.0-1019.19~24.04.2+1"
+        }
+      },
+      "qualification": "validated"
+    },
+    "610.57.04": {
+      "manifest": "provenance-610.json",
+      "patch": "patches/0002-pack-user-leaf-tables-610.patch",
+      "patch_sha256": "d1d90604614b86b33c11c9366daafbe0981e84653a7e4881328734711ad2dcaf",
+      "kernels": {
+        "7.0.0-1019-nvidia-64k": {
+          "module_package_version": "7.0.0-1019.19~24.04.2+1"
+        }
+      },
+      "qualification": "conditional",
+      "caveat": "Stock R610 faults on large DMA mappings with 64 KiB pages. Hardware checks passed only with a separate RM alignment correction; serving also required system pools disabled. This package installs neither correction. See docs/driver-610.md."
+    }
+  }
+}

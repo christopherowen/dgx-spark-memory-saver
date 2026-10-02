@@ -1,13 +1,10 @@
 # DGX Spark Memory Saver
 
-**R610 qualification branch:** package 0.3.0 targets NVIDIA 610.57.04.
-This port passed bounded GPU and serving checks with a separately corrected RM
-driver and system memory pools disabled. Stock R610 failed the large-copy check
-on 64 KiB Linux, including with stock UVM; this branch alone does not fix it.
-The performance and installation evidence below
-belongs to the released 580.178.04 / 0.2.0 implementation. Use
-[the R610 port notes](docs/driver-610.md) for this branch; the other installation
-guides describe the released R580 package.
+**One package for reviewed NVIDIA driver versions.** The builder selects the
+source manifest and patch from [compatibility.json](compatibility.json), using
+the NVIDIA RM installed for the target kernel. R580 is the production-tested
+profile; R610 has [additional driver requirements](docs/driver-610.md).
+See [compatibility and adding releases](docs/compatibility.md).
 
 **Recover memory lost to GPU page tables on a 64 KiB DGX Spark kernel.**
 
@@ -54,9 +51,9 @@ Root tables and other allocation sizes retain their original allocation.
 
 Choose [manual installation](docs/manual.md) or [DKMS installation](docs/dkms.md).
 Both are persistent and enable packing by default; installation is the opt-in.
-The manual route has build/sign/install/remove helpers. DKMS package `0.2.0`
-manages its own builds and signing. Both install only UVM, check the pinned
-kernel/driver combination, and refresh the target initramfs. Module loading,
+The manual route has build/sign/install/remove helpers. DKMS package `0.4.0`
+manages its own builds and signing. Both install only UVM, check the selected
+kernel/driver profile, and refresh the target initramfs. Module loading,
 service control and boot selection remain explicit operator steps.
 
 ```sh
@@ -97,7 +94,9 @@ includes allocation readback and serving checks alongside compilation.
 Validated on NVIDIA DGX Spark (GB10, Linux aarch64), NVIDIA open driver
 `580.178.04-0ubuntu0.24.04.1`, and Ubuntu kernel `7.0.0-1019-nvidia-64k`.
 The build verifies the exact source package and both patched source files.
-Support is pinned to this validated combination. The [kernel setup guide](docs/kernel.md)
+The compatibility table also records the conditional R610 profile. Package
+0.4.0 shares build, signing, installation and status code across both profiles;
+its packaging checks are distinct from the earlier 0.2.0 hardware lifecycle tests. The [kernel setup guide](docs/kernel.md)
 installs the tested distribution packages; the driver build script builds the
 UVM patch against their headers.
 
@@ -125,7 +124,8 @@ This is the development home for the patch originally tested in
 That repository retains its historical experiment snapshot.
 [provenance.json](provenance.json) records the source identity and copied-file
 hashes. The extracted patch and GPU tests are byte-identical to the tested
-versions. The shared build helper verifies the same pins; both persistent builds
+versions. The shared build helper verifies each selected profile
+and records it in the build receipt; both persistent builds
 apply a separate [default-on packaging patch](packaging/enable-packing.patch).
 
 Upstream submission and production promotion remain separate steps. Driver/kernel

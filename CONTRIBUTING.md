@@ -23,8 +23,8 @@ as validation of changed code.
 Build only in an isolated source copy. The normal build and check commands must
 not install or load modules, enroll keys, change boot settings or modify the
 packaged NVIDIA source. Kernel or driver upgrades need explicit review and new
-validation. Keep the DKMS kernel exclusion in sync with the manifest and
-retain the pre-install checks for cached binaries. Only UVM may be registered;
+validation. Keep the shared compatibility profiles and qualification evidence current;
+DKMS derives its kernel exclusion from that table. Retain the pre-install checks for cached binaries. Only UVM may be registered;
 never install the RM build output. Bump `PACKAGE_VERSION` for released packaging
 changes and keep installation/removal documentation aligned. Test DKMS
 installation and restoration in an exclusive window before claiming on-device

@@ -73,14 +73,14 @@ def generate(directory):
                   '-noout', '-subject', '-fingerprint', '-sha256').stdout.decode().strip())
 
 
-def build_sign(directory, headers=None):
+def build_sign(directory, headers=None, kernel=driver.KERNEL):
     private, certificate = directory / 'MOK.priv', directory / 'MOK.der'
     check_pair(private, certificate)
     require_enrolled(certificate)
-    headers = headers or Path('/lib/modules') / driver.KERNEL / 'build'
+    headers = headers or Path('/lib/modules') / kernel / 'build'
     sign_file = headers / 'scripts/sign-file'
     driver.require(sign_file.is_file(), f'Missing target signing tool: {sign_file}')
-    driver.build(driver.KERNEL, headers, dkms=True)
+    driver.build(kernel, headers, dkms=True)
     module = driver.WORK / 'nvidia-uvm.ko'
     driver.run(str(sign_file), 'sha256', str(private), str(certificate), str(module))
     signer = driver.output('modinfo', '-F', 'signer', str(module))
@@ -93,18 +93,19 @@ def build_sign(directory, headers=None):
                    certificate_sha256=hashlib.sha256(public_copy.read_bytes()).hexdigest(),
                    module_sha256=hashlib.sha256(module.read_bytes()).hexdigest())
     receipt_path.write_text(json.dumps(receipt, indent=2) + '\n')
-    print(f'Signed for {driver.KERNEL} by {signer}; not installed or loaded.')
+    print(f'Signed for {kernel} by {signer}; not installed or loaded.')
 
 
 def main(action):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--key-dir', type=Path, default=key_directory())
+    parser.add_argument('--kernel', default=driver.KERNEL)
     args = parser.parse_args()
     try:
         if action == 'generate':
             generate(args.key_dir)
         else:
-            build_sign(args.key_dir)
+            build_sign(args.key_dir, kernel=args.kernel)
     except (RuntimeError, OSError, ValueError, subprocess.CalledProcessError) as error:
         print(f'memory-saver: {error}', file=sys.stderr)
         return 1

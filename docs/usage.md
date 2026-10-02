@@ -60,8 +60,8 @@ while compiling. Before loading, verify the running kernel, module and source:
 uname -r
 getconf PAGESIZE
 cat /sys/module/nvidia/version
-modinfo .work/nvidia-580.178.04-uvm-pool/nvidia-uvm.ko
-sha256sum .work/nvidia-580.178.04-uvm-pool/nvidia-uvm.ko
+modinfo .work/uvm/nvidia-uvm.ko
+sha256sum .work/uvm/nvidia-uvm.ko
 ```
 
 The load target must be `7.0.0-1019-nvidia-64k` with 65,536-byte pages and the
@@ -77,7 +77,7 @@ enrolled `DGX_MOK_DIR`:
 ```sh
 sudo /lib/modules/7.0.0-1019-nvidia-64k/build/scripts/sign-file sha256 \
   "$DGX_MOK_DIR/MOK.priv" "$DGX_MOK_DIR/MOK.der" \
-  .work/nvidia-580.178.04-uvm-pool/nvidia-uvm.ko
+  .work/uvm/nvidia-uvm.ko
 ```
 
 A signature is a loading requirement, not proof of correctness. The combined
@@ -92,7 +92,7 @@ only the built UVM module; keep the packaged RM, modeset and DRM modules.
 sudo fuser /dev/nvidia-uvm
 # Proceed only when this reports no users.
 sudo modprobe -r nvidia_uvm
-sudo insmod .work/nvidia-580.178.04-uvm-pool/nvidia-uvm.ko \
+sudo insmod .work/uvm/nvidia-uvm.ko \
   uvm_pack_sysmem_leaf_tables=1 \
   uvm_release_asserts=1 \
   uvm_release_asserts_set_global_error=1

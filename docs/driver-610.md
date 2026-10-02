@@ -1,8 +1,8 @@
 # NVIDIA 610.57.04 port
 
-This unpromoted branch builds package 0.3.0 for Ubuntu source package
+The shared builder selects the R610 profile for Ubuntu source package
 `nvidia-kernel-source-610-open=610.57.04-0ubuntu0.24.04.3` and the existing
-`7.0.0-1019-nvidia-64k` kernel. It remains unpromoted.
+`7.0.0-1019-nvidia-64k` kernel. The profile remains conditional and is not the production choice.
 
 ## Hardware qualification, 2026-10-02
 
@@ -36,8 +36,8 @@ onto R610. Only surrounding context changes: the aperture comments and the
 `mmu_mode_hal()` signature. Allocation, per-tree ownership, coherent-DMA gate,
 tracker wait before reuse, zeroing, unmapping and accounting are preserved.
 R610 still allocates a full CPU page for these small tables without the patch.
-The original patch and results remain unchanged; `provenance-580.json` retains
-the previous source manifest and `provenance.json` pins the new source hashes.
+The original patch and results remain unchanged; `provenance.json` retains
+the original source manifest and `provenance-610.json` pins the R610 source hashes.
 
 Before changing packages, stop GPU clients and remove the 0.2.0 DKMS
 registration. Keep exact R580 packages available for restoration. Install both
@@ -49,15 +49,14 @@ at `610.57.04-0ubuntu0.24.04.3`. The metapackages provide the NVIDIA DKMS
 dependency without registering NVIDIA's separate DKMS build. Simulate the
 transaction first and retain firmware needed by the previous driver.
 
-Copy this clean pinned checkout to `/usr/src/dgx-spark-memory-saver-0.3.0`,
-excluding `.git` and `.work`. Run `sudo dkms add -m dgx-spark-memory-saver -v
-0.3.0`, then `sudo dkms build -m dgx-spark-memory-saver -v 0.3.0 -k
-7.0.0-1019-nvidia-64k` and the corresponding `dkms install`. Use the already
-enrolled fleet signing key. Confirm signed R610 RM/UVM, reboot, and verify
-`./scripts/status --json` before allocation and serving tests.
+Use the shared [DKMS registration and build commands](dkms.md), package version
+0.4.0. The builder selects the R610 manifest from the target kernel's installed
+RM version and reports its conditional qualification. It does not install an RM
+correction, change system-pool settings or claim that stock R610 is safe.
 
-Remove with `sudo dkms remove -m dgx-spark-memory-saver -v 0.3.0 --all`
-while GPU clients are stopped. The hook restores stock R610 UVM and refreshes
-initramfs. To restore R580, remove this registration first, reinstall the
-recorded R580 packages, reinstall the pinned 0.2.0 source/registration, and
-reboot before starting serving. Never load an R580 UVM beside R610 RM.
+Before a driver change, remove the exact registered memory-saver version while
+GPU clients are stopped. Its removal hook restores stock UVM and refreshes the
+initramfs. Restore/install the matching driver packages, then rebuild the shared
+package for that driver; do not reuse a cached UVM from another NVIDIA release.
+Never load an R580 UVM beside R610 RM. The 0.3.0 branch and deployment experiment
+retain the original R610 hardware-test identity.

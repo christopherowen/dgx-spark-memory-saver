@@ -2,13 +2,13 @@
   "schema_version": 1,
   "upstream": {
     "repository": "https://github.com/NVIDIA/open-gpu-kernel-modules",
-    "tag": "580.178.04",
-    "package": "nvidia-kernel-source-580-open",
-    "package_version": "580.178.04-0ubuntu0.24.04.1",
-    "source_root": "/usr/src/nvidia-580.178.04",
+    "tag": "610.57.04",
+    "package": "nvidia-kernel-source-610-open",
+    "package_version": "610.57.04-0ubuntu0.24.04.3",
+    "source_root": "/usr/src/nvidia-610.57.04",
     "file_sha256": {
-      "nvidia-uvm/uvm_mmu.c": "61dcbb1826e6104452d82d319b5b8c810e328e6a606f619e0efaa273d162bdea",
-      "nvidia-uvm/uvm_mmu.h": "9676e8dd2e3ce37390fdac6a8dd18d728d23e81ce4f47f7978971928ec9ba419"
+      "nvidia-uvm/uvm_mmu.c": "b8572dc2e4dcefeec246bdc97c4a3f0f2537bd3b75ac4b7e163c4b20d1b6caff",
+      "nvidia-uvm/uvm_mmu.h": "3783bdd29f20c0dc84bbfac27bdfca772b420625e1b452d29e30c7de98ac4ad6"
     }
   },
   "tested_kernel": "7.0.0-1019-nvidia-64k",
@@ -46,5 +46,11 @@
       "original_path": "experiments/2026-10-02-kernel-64k/uvm-pool/trial-results.json",
       "sha256": "0332a6422c60d85f2696333e19d102986b43928a3babde5f934e0d1b5bf65d86"
     }
+  },
+  "port": {
+    "patch": "patches/0002-pack-user-leaf-tables-610.patch",
+    "sha256": "d1d90604614b86b33c11c9366daafbe0981e84653a7e4881328734711ad2dcaf",
+    "status": "GPU and serving checks passed with separately corrected RM and system pools disabled; production remains R580.",
+    "changes": "Rebased context only; allocation, ownership, DMA, accounting, reuse barriers and gates unchanged."
   }
 }

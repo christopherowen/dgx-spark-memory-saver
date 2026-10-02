@@ -9,7 +9,9 @@ standalone tests and evidence. It does not manage the serving cluster.
   before slot reuse. Document any change to these invariants.
 - The temporary `build.sh` defaults packing off; persistent manual and DKMS
   installation opt in through the separate default-on packaging patch. Keep the allocator patch and recorded
-  results immutable. DKMS supports only the pinned kernel/driver combination.
+  results immutable. DKMS supports only combinations registered in compatibility.json. Preserve
+  source/package pins and qualification status per profile; do not use a
+  wildcard version or patch success alone as evidence of compatibility.
 - Build in an ignored copy of the source; never edit packaged driver sources.
 - Do not install/load modules, reboot machines or run GPU tests without explicit
   authorization and coordination with the machine's current owner.

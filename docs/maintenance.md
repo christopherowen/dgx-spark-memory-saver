@@ -75,7 +75,9 @@ memory measurements. Do not bypass the source checks or copy a module built
 for a different kernel. Use the packaged driver while a new combination is
 unverified.
 
-Both installation methods support the pinned combination. DKMS build
+Both installation methods select reviewed combinations from
+[compatibility.json](../compatibility.json). Adding a version is described in
+[the compatibility guide](compatibility.md). DKMS build
 exclusions skip unvalidated kernels. Remove either override before
 NVIDIA driver updates: checks on new builds do not remove a previously installed
 binary after RM changes. Installing through DKMS does not change the stock GRUB
