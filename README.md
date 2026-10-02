@@ -67,10 +67,11 @@ five serving quality checks on three Sparks. Benchmarks used the same client,
 prompts and pinned speculative-verification costs for the final comparison.
 No request failures, swap growth or thermal slowdown were observed.
 
-Version `0.2.0` also passed an isolated DKMS build/sign on dgx1 and live
-read-only status inspection. Persistent installation/removal and reboot with
-these new helpers still require on-device acceptance; they have not been
-performed on the serving cluster.
+Version `0.2.0` also passed [real manual and DKMS installation, removal and
+reboot checks on dgx3](docs/validation.md#installation-and-removal-on-dgx3),
+with Secure Boot enabled. Each installed module and each restored stock module
+passed both CUDA tests after reboot. The separate isolated DKMS build/sign on
+dgx1 and live read-only status inspection also passed.
 
 See [measurements and limitations](docs/validation.md), the unchanged
 [benchmark reports](results/2026-10-02/), and [test programs](tests/).

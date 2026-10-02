@@ -234,7 +234,8 @@ getconf PAGESIZE
 cat /sys/module/nvidia/version
 nvidia-smi
 systemctl --failed
-systemctl is-active nv-cpu-governor.service
+systemctl show nv-cpu-governor.service -p Result -p ExecMainStatus
+journalctl -b -u nv-cpu-governor.service --no-pager
 cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
 sudo swapon /swap-64k.img
 swapon --show
@@ -243,10 +244,15 @@ sudo journalctl -k -b -p warning
 
 Require `7.0.0-1019-nvidia-64k`, `65536`, driver `580.178.04`, and working
 network/fan/CPU governor services. On the tested hosts the CPU governors read
-`performance`. Skip manual `swapon` if the correct file is already active.
-The package installation initially gives you **stock UVM on a 64 KiB kernel**;
-packing is not active until you follow [manual load and verify](usage.md#load-and-verify)
-or install and verify the [DKMS build](dkms.md#5-load-and-verify).
+`performance`. The governor service exits after setting them: `inactive` is
+normal after a successful run. Require `Result=success`, `ExecMainStatus=0`,
+a successful run in this boot's journal and the expected actual governors;
+`systemctl is-active` alone incorrectly rejects this working service.
+Skip manual `swapon` if the correct file is already active.
+Kernel packages alone provide **stock UVM on a 64 KiB kernel**. A persistent
+manual or DKMS installation made before reboot instead selects its patched
+module when UVM loads. Follow [load and verify](usage.md#load-and-verify) to
+check the actual loaded identity and packing state.
 
 ### Reproduce the measured memory profile
 

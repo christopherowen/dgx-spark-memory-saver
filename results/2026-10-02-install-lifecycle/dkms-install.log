@@ -1,0 +1,22 @@
+Deprecated feature: CLEAN (/usr/src/dgx-spark-memory-saver-0.2.0/dkms.conf)
+Creating symlink /var/lib/dkms/dgx-spark-memory-saver/0.2.0/source -> /usr/src/dgx-spark-memory-saver-0.2.0
+Deprecated feature: CLEAN (/var/lib/dkms/dgx-spark-memory-saver/0.2.0/source/dkms.conf)
+Sign command: /usr/bin/kmodsign
+Signing key: /root/.local/share/dgx-spark-fan-control/keys/MOK.priv
+Public certificate (MOK): /root/.local/share/dgx-spark-fan-control/keys/MOK.der
+
+Building module(s)............ done.
+Signing module /var/lib/dkms/dgx-spark-memory-saver/0.2.0/build/.work/nvidia-580.178.04-uvm-pool/nvidia-uvm.ko
+Deprecated feature: CLEAN (/var/lib/dkms/dgx-spark-memory-saver/0.2.0/source/dkms.conf)
+Running the pre_install script:
+Found pre-existing /lib/modules/7.0.0-1019-nvidia-64k/kernel/nvidia-580-open/nvidia-uvm.ko, archiving for uninstallation
+Installing /lib/modules/7.0.0-1019-nvidia-64k/updates/dkms/nvidia-uvm.ko.zst
+Running the post_install script:
+update-initramfs: Generating /boot/initrd.img-7.0.0-1019-nvidia-64k
+Running depmod... done.
+dgx-spark-memory-saver/0.2.0, 7.0.0-1019-nvidia-64k, aarch64: installed (Original modules exist)
+/lib/modules/7.0.0-1019-nvidia-64k/updates/dkms/nvidia-uvm.ko.zst
+580.178.04
+7.0.0-1019-nvidia-64k SMP preempt mod_unload modversions aarch64
+DGX Fleet Secure Boot Module Signature key
+update-initramfs: Generating /boot/initrd.img-7.0.0-1019-nvidia-64k

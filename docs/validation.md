@@ -1,8 +1,9 @@
 # Validation: 2026-10-02
 
-The evidence predates extraction into this repository. Patch, GPU tests and JSON
-reports were copied unchanged from the pinned experiment in `provenance.json`.
-Repository extraction did not run another GPU trial or change serving.
+The original allocator and performance evidence below predates extraction into
+this repository. Patch, GPU tests and JSON reports were copied unchanged from
+the pinned experiment in `provenance.json`. Subsequent packaging and installation
+checks are recorded separately below; they do not replace those measurements.
 
 ## Environment
 
@@ -134,9 +135,8 @@ The hardware-free suite exercises real disposable key generation and certificate
 checks, signing orchestration, signed/unsigned installation policy, driver
 identity checks, conflicting registrations, changed artifacts, interrupted
 installation/removal and read-only status reporting. All host mutations in
-those tests are isolated filesystem fixtures or command doubles. Manual and
-system DKMS installation, removal and reboot remain unvalidated on the Sparks
-until a coordinated deployment window.
+those tests are isolated filesystem fixtures or command doubles. The later
+on-device installation lifecycle is recorded separately below.
 
 ### Isolated DKMS build on dgx1
 
@@ -167,3 +167,60 @@ This closes the actual DKMS compilation/signing and live read-only status
 checks. It does not validate system-wide installation, removal, key enrollment
 or reboot. No module was loaded, no GPU test ran and no production service was
 restarted; the host retained its stock 4 KiB kernel and UVM.
+
+### Installation and removal on dgx3
+
+On 2026-10-02, commit `531be47a3574729ccac3b7317fde404605ea205e`
+was tested with actual host installation and reboot operations on dgx3. All
+three serving ranks were stopped in a reserved maintenance window. The test
+used the documented pinned packages, DKMS 3.4.3 and an existing enrolled
+signing key; Secure Boot stayed enabled throughout.
+
+| Route | Installation | Booted installed module | Removal | Booted stock module |
+| --- | --- | --- | --- | --- |
+| Persistent manual | `build-sign`, `install-manual` | Packing `Y`, loaded/disk identity matches | `remove-manual` | Stock UVM, packing parameter absent |
+| DKMS | Source registration, `dkms add/build/install` | Packing `Y`, loaded/disk identity matches | `dkms remove --all`, explicit index/initramfs refresh | Stock UVM, packing parameter absent |
+
+Each of these four 64 KiB boots passed the two unmodified GPU tests in a
+20 GiB container: 3,584 allocations across four threads with full readback,
+4.5 GiB pinned transfers, BF16 matrix multiplication and CUDA graph replay.
+No matching UVM assertion, Xid, kernel oops or OOM was found in the boot logs.
+Every status inspection returned no issues or unknowns. Patched builds loaded
+source version `34683B82C2D3339BBD2EEC9`; restored stock loaded
+`09F2A78862D06017E9324B6`.
+
+Manual installation left the packaged UVM file intact. DKMS archived that
+file and restored it on removal without a package reinstall. Its SHA-256 was
+`6220ef63ef43322ae050fc563ee4d58397234a5c71a273dc5b6e632f1693d9fb`
+before and after both routes. NVIDIA source files, package versions, GRUB
+configuration and `fstab` also matched their pre-test captures. Fan-control
+remained installed for both kernels, and network, swap and CPU governor checks
+passed. Both installer implementations worked without modification.
+
+The test found two documentation corrections: the CPU governor service exits
+successfully after setting all CPUs to `performance`, so `is-active` is not a
+valid success test; and a persistent override installed before reboot is
+already selected when UVM loads on the candidate kernel. The kernel guide now
+checks the governor result, this boot's journal and actual governor values,
+and distinguishes kernel-package installation from a preinstalled UVM override.
+
+A fifth, normal reboot returned dgx3 to the retained stock 4 KiB kernel and
+its original swap/THP policy. All three nodes then matched stock kernel and
+UVM identities. Production r5o was restored, `doctor --live` passed, and the
+[serving quality gate passed 5/5](../results/2026-10-02-install-lifecycle/production-restored.log)
+with no swap growth. The cluster reservation was released. No memory-saver
+installation, DKMS registration or registered source remains on the test host;
+the temporary build was cleaned. The boot default was not changed.
+
+This exercises an already-prepared Spark, not a fresh OS installation or new
+MOK enrollment. It does not add a memory/performance measurement or qualify a
+new driver/kernel combination. The original three-node model validation above
+remains separate from these packaging checks.
+
+The [lifecycle record](../results/2026-10-02-install-lifecycle/lifecycle.json)
+contains each boot identity, loaded/on-disk status and GPU-test result. Actual
+[manual install](../results/2026-10-02-install-lifecycle/manual-install.log),
+[manual removal](../results/2026-10-02-install-lifecycle/manual-remove.log),
+[DKMS install](../results/2026-10-02-install-lifecycle/dkms-install.log) and
+[DKMS removal](../results/2026-10-02-install-lifecycle/dkms-remove.log) outputs
+are retained alongside it. No private keys or module binaries are included.

@@ -1,0 +1,16 @@
+configuration OK; live cluster matches
+benchmarking http://10.0.1.71:8000 (config/cluster.json); writing results/private/bench/memory-saver-lifecycle-20261002-restored/bench.json
+quality:
+  quality 1/5: pass
+  quality 2/5: pass
+  quality 3/5: pass
+  quality 4/5: pass
+  quality 5/5: pass
+quality: LRU 5/5
+dgx1: min MemAvailable 6.75 GiB, swap growth 0.0 GiB
+dgx2: min MemAvailable 7.73 GiB, swap growth 0.0 GiB
+dgx3: min MemAvailable 7.77 GiB, swap growth 0.0 GiB
+dgx1: GPU max 44.0 C (52.0 C below its limit at the closest), board max 46.8 C, power max 11.03 W, thermal slowdown 0.0 ms
+dgx2: GPU max 43.0 C (53.0 C below its limit at the closest), board max 45.1 C, power max 11.41 W, thermal slowdown 0.0 ms
+dgx3: GPU max 43.0 C (54.0 C below its limit at the closest), board max 44.8 C, power max 10.93 W, thermal slowdown 0.0 ms
+report: results/private/bench/memory-saver-lifecycle-20261002-restored/bench.json

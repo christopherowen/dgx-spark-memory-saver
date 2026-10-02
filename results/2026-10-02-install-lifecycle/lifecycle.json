@@ -1,0 +1,324 @@
+{
+  "schema": 1,
+  "date": "2026-10-02",
+  "host": "dgx3",
+  "code_commit": "531be47a3574729ccac3b7317fde404605ea205e",
+  "package_version": "0.2.0",
+  "dkms_version": "3.4.3",
+  "serving_repository_commit": "0e3b624e55e350ca621b336f8b88626f60dec9da",
+  "image": "vllm-ds41f-kkref:04c30fa98e79-r5o",
+  "image_id": "sha256:288fc5bd909eb7e5fa51bd5abd94286140a0f07c40b92d763f8be4970309e5ab",
+  "manual_build": {
+    "schema": 1,
+    "kernel": "7.0.0-1019-nvidia-64k",
+    "driver": "580.178.04",
+    "default_on": true,
+    "module_sha256": "0338565a4fe98b6930b658157eac908ec2cb4007d40dcf38d6602bb737c5d4a6",
+    "signed": true,
+    "signer": "DGX Fleet Secure Boot Module Signature key",
+    "certificate_sha256": "445045f0f33cedbe940fd7329afff11046b9530d2aab1494297880bdad589064"
+  },
+  "dkms_installed_compressed_sha256": "6b758948ef83709e76dc892b9ef0b5e45167d726e2c3dbfe9894694de29d1742",
+  "stock_uvm_sha256_before_and_after": "6220ef63ef43322ae050fc563ee4d58397234a5c71a273dc5b6e632f1693d9fb",
+  "source_packages_grub_fstab_unchanged": true,
+  "boots": [
+    {
+      "phase": "manual",
+      "route": "manual",
+      "installed": true,
+      "observed_at": "Fri Oct  2 10:05:06 UTC 2026",
+      "boot_id": "c0c3546b-5bc0-470d-82ea-fdb098e65a12",
+      "status": {
+        "kernel": "7.0.0-1019-nvidia-64k",
+        "page_size": "65536",
+        "rm_version": "580.178.04",
+        "uvm_loaded": true,
+        "loaded_srcversion": "34683B82C2D3339BBD2EEC9",
+        "packing": "Y",
+        "current_disk": {
+          "filename": "/lib/modules/7.0.0-1019-nvidia-64k/updates/dgx-spark-memory-saver/nvidia-uvm.ko",
+          "version": "580.178.04",
+          "srcversion": "34683B82C2D3339BBD2EEC9",
+          "signer": "DGX Fleet Secure Boot Module Signature key",
+          "packing_parameter": true
+        },
+        "target_disk": {
+          "filename": "/lib/modules/7.0.0-1019-nvidia-64k/updates/dgx-spark-memory-saver/nvidia-uvm.ko",
+          "version": "580.178.04",
+          "srcversion": "34683B82C2D3339BBD2EEC9",
+          "signer": "DGX Fleet Secure Boot Module Signature key",
+          "packing_parameter": true
+        },
+        "target_rm_version": "580.178.04",
+        "secure_boot": "SecureBoot enabled",
+        "manual_install": {
+          "schema": 1,
+          "kernel": "7.0.0-1019-nvidia-64k",
+          "driver": "580.178.04",
+          "default_on": true,
+          "module_sha256": "0338565a4fe98b6930b658157eac908ec2cb4007d40dcf38d6602bb737c5d4a6",
+          "signed": true,
+          "signer": "DGX Fleet Secure Boot Module Signature key",
+          "certificate_sha256": "445045f0f33cedbe940fd7329afff11046b9530d2aab1494297880bdad589064",
+          "state": "installed",
+          "method": "manual",
+          "package_version": "0.2.0",
+          "destination": "/lib/modules/7.0.0-1019-nvidia-64k/updates/dgx-spark-memory-saver/nvidia-uvm.ko"
+        },
+        "dkms": [],
+        "issues": [],
+        "unknowns": [],
+        "state": "packing-enabled"
+      },
+      "cuda_tests": [
+        {
+          "passed": true,
+          "allocations": 3584,
+          "threads": 4,
+          "rounds": 12,
+          "full_buffer_readback": true,
+          "seconds": 2.530574139999999
+        },
+        {
+          "passed": true,
+          "large_copy_bytes": 4831838208,
+          "seconds": 1.2963289009999954,
+          "device": "NVIDIA GB10",
+          "torch": "2.13.0+cu130"
+        }
+      ]
+    },
+    {
+      "phase": "manual-removed",
+      "route": "manual",
+      "installed": false,
+      "observed_at": "Fri Oct  2 10:07:29 UTC 2026",
+      "boot_id": "fa6ce31b-a384-496f-affd-d72bf7fd6820",
+      "status": {
+        "kernel": "7.0.0-1019-nvidia-64k",
+        "page_size": "65536",
+        "rm_version": "580.178.04",
+        "uvm_loaded": true,
+        "loaded_srcversion": "09F2A78862D06017E9324B6",
+        "packing": null,
+        "current_disk": {
+          "filename": "/lib/modules/7.0.0-1019-nvidia-64k/kernel/nvidia-580-open/nvidia-uvm.ko",
+          "version": "580.178.04",
+          "srcversion": "09F2A78862D06017E9324B6",
+          "signer": "Canonical Ltd. Kernel Module Signing",
+          "packing_parameter": false
+        },
+        "target_disk": {
+          "filename": "/lib/modules/7.0.0-1019-nvidia-64k/kernel/nvidia-580-open/nvidia-uvm.ko",
+          "version": "580.178.04",
+          "srcversion": "09F2A78862D06017E9324B6",
+          "signer": "Canonical Ltd. Kernel Module Signing",
+          "packing_parameter": false
+        },
+        "target_rm_version": "580.178.04",
+        "secure_boot": "SecureBoot enabled",
+        "manual_install": null,
+        "dkms": [],
+        "issues": [],
+        "unknowns": [],
+        "state": "stock-loaded"
+      },
+      "cuda_tests": [
+        {
+          "passed": true,
+          "allocations": 3584,
+          "threads": 4,
+          "rounds": 12,
+          "full_buffer_readback": true,
+          "seconds": 2.4883854720000045
+        },
+        {
+          "passed": true,
+          "large_copy_bytes": 4831838208,
+          "seconds": 1.4210718719999988,
+          "device": "NVIDIA GB10",
+          "torch": "2.13.0+cu130"
+        }
+      ]
+    },
+    {
+      "phase": "dkms",
+      "route": "dkms",
+      "installed": true,
+      "observed_at": "Fri Oct  2 10:09:53 UTC 2026",
+      "boot_id": "7eb5fc62-8c22-4f8a-b5f6-77946f061155",
+      "status": {
+        "kernel": "7.0.0-1019-nvidia-64k",
+        "page_size": "65536",
+        "rm_version": "580.178.04",
+        "uvm_loaded": true,
+        "loaded_srcversion": "34683B82C2D3339BBD2EEC9",
+        "packing": "Y",
+        "current_disk": {
+          "filename": "/lib/modules/7.0.0-1019-nvidia-64k/updates/dkms/nvidia-uvm.ko.zst",
+          "version": "580.178.04",
+          "srcversion": "34683B82C2D3339BBD2EEC9",
+          "signer": "DGX Fleet Secure Boot Module Signature key",
+          "packing_parameter": true
+        },
+        "target_disk": {
+          "filename": "/lib/modules/7.0.0-1019-nvidia-64k/updates/dkms/nvidia-uvm.ko.zst",
+          "version": "580.178.04",
+          "srcversion": "34683B82C2D3339BBD2EEC9",
+          "signer": "DGX Fleet Secure Boot Module Signature key",
+          "packing_parameter": true
+        },
+        "target_rm_version": "580.178.04",
+        "secure_boot": "SecureBoot enabled",
+        "manual_install": null,
+        "dkms": [
+          "dgx-spark-memory-saver/0.2.0, 7.0.0-1019-nvidia-64k, aarch64: installed (Original modules exist)"
+        ],
+        "issues": [],
+        "unknowns": [],
+        "state": "packing-enabled"
+      },
+      "cuda_tests": [
+        {
+          "passed": true,
+          "allocations": 3584,
+          "threads": 4,
+          "rounds": 12,
+          "full_buffer_readback": true,
+          "seconds": 2.5670363520000024
+        },
+        {
+          "passed": true,
+          "large_copy_bytes": 4831838208,
+          "seconds": 1.345053696000008,
+          "device": "NVIDIA GB10",
+          "torch": "2.13.0+cu130"
+        }
+      ]
+    },
+    {
+      "phase": "dkms-removed",
+      "route": "dkms",
+      "installed": false,
+      "observed_at": "Fri Oct  2 10:12:40 UTC 2026",
+      "boot_id": "e4b15ce5-2151-4701-b8db-4d7814d009d8",
+      "status": {
+        "kernel": "7.0.0-1019-nvidia-64k",
+        "page_size": "65536",
+        "rm_version": "580.178.04",
+        "uvm_loaded": true,
+        "loaded_srcversion": "09F2A78862D06017E9324B6",
+        "packing": null,
+        "current_disk": {
+          "filename": "/lib/modules/7.0.0-1019-nvidia-64k/kernel/nvidia-580-open/nvidia-uvm.ko",
+          "version": "580.178.04",
+          "srcversion": "09F2A78862D06017E9324B6",
+          "signer": "Canonical Ltd. Kernel Module Signing",
+          "packing_parameter": false
+        },
+        "target_disk": {
+          "filename": "/lib/modules/7.0.0-1019-nvidia-64k/kernel/nvidia-580-open/nvidia-uvm.ko",
+          "version": "580.178.04",
+          "srcversion": "09F2A78862D06017E9324B6",
+          "signer": "Canonical Ltd. Kernel Module Signing",
+          "packing_parameter": false
+        },
+        "target_rm_version": "580.178.04",
+        "secure_boot": "SecureBoot enabled",
+        "manual_install": null,
+        "dkms": [],
+        "issues": [],
+        "unknowns": [],
+        "state": "stock-loaded"
+      },
+      "cuda_tests": [
+        {
+          "passed": true,
+          "allocations": 3584,
+          "threads": 4,
+          "rounds": 12,
+          "full_buffer_readback": true,
+          "seconds": 2.9218943799999977
+        },
+        {
+          "passed": true,
+          "large_copy_bytes": 4831838208,
+          "seconds": 1.4026282980000033,
+          "device": "NVIDIA GB10",
+          "torch": "2.13.0+cu130"
+        }
+      ]
+    },
+    {
+      "phase": "stock",
+      "route": "normal stock boot",
+      "installed": false,
+      "observed_at": "Fri Oct  2 10:14:52 UTC 2026",
+      "boot_id": "87564ff8-8b2c-4366-bdda-2cdd8a1fad80",
+      "status": {
+        "kernel": "7.0.0-1019-nvidia",
+        "page_size": "4096",
+        "rm_version": "580.178.04",
+        "uvm_loaded": true,
+        "loaded_srcversion": "09F2A78862D06017E9324B6",
+        "packing": null,
+        "current_disk": {
+          "filename": "/lib/modules/7.0.0-1019-nvidia/kernel/nvidia-580-open/nvidia-uvm.ko",
+          "version": "580.178.04",
+          "srcversion": "09F2A78862D06017E9324B6",
+          "signer": "Canonical Ltd. Kernel Module Signing",
+          "packing_parameter": false
+        },
+        "target_disk": {
+          "filename": "/lib/modules/7.0.0-1019-nvidia-64k/kernel/nvidia-580-open/nvidia-uvm.ko",
+          "version": "580.178.04",
+          "srcversion": "09F2A78862D06017E9324B6",
+          "signer": "Canonical Ltd. Kernel Module Signing",
+          "packing_parameter": false
+        },
+        "target_rm_version": "580.178.04",
+        "secure_boot": "SecureBoot enabled",
+        "manual_install": null,
+        "dkms": [],
+        "issues": [],
+        "unknowns": [],
+        "state": "stock-loaded"
+      }
+    }
+  ],
+  "scope": [
+    "Actual manual and system DKMS installation/removal on one prepared Spark",
+    "Four one-shot 64 KiB boots plus normal return to 4 KiB",
+    "Existing enrolled signing identity; Secure Boot enabled",
+    "GPU correctness at installed and removed state for each route"
+  ],
+  "not_tested": [
+    "Fresh OS/kernel package installation",
+    "New firmware MOK enrollment",
+    "Changed kernel or NVIDIA version",
+    "New performance/memory comparison",
+    "Three-node serving with these persistent installers"
+  ],
+  "observations": [
+    "Governor service reports inactive after successful completion; use Result, ExecMainStatus, this-boot journal and actual governors",
+    "DKMS archived and restored the stock UVM byte-for-byte; no force flag or package reinstall",
+    "No UVM assertions, Xids, oops or OOM matched the four candidate boot logs"
+  ],
+  "restoration": {
+    "kernel_all_nodes": "7.0.0-1019-nvidia",
+    "page_size_all_nodes": 4096,
+    "uvm_srcversion_all_nodes": "09F2A78862D06017E9324B6",
+    "production": "r5o",
+    "doctor_live": "configuration OK; live cluster matches",
+    "quality_passed": 5,
+    "quality_runs": 5,
+    "quality_ok": true,
+    "quality_started_utc": "20261002T101733Z",
+    "quality_finished_utc": "20261002T101747Z",
+    "raw_bench_sha256": "dfd852417f9eaac142315adc35758ea4792141b21b0fc0fdd483b4c8f7c71d1b",
+    "raw_bench_path_on_dgx1": "/home/swank/projects/spark3-vllm-ds41f/results/private/bench/memory-saver-lifecycle-20261002-restored/bench.json",
+    "hold_removed": true,
+    "temporary_build_removed": true,
+    "dkms_source_and_registration_removed": true
+  }
+}

@@ -1,0 +1,61 @@
+update-initramfs: Generating /boot/initrd.img-7.0.0-1019-nvidia-64k
+Manual override removed and stock UVM selected; not loaded.
+{
+  "kernel": "7.0.0-1019-nvidia-64k",
+  "page_size": "65536",
+  "rm_version": "580.178.04",
+  "uvm_loaded": true,
+  "loaded_srcversion": "09F2A78862D06017E9324B6",
+  "packing": null,
+  "current_disk": {
+    "filename": "/lib/modules/7.0.0-1019-nvidia-64k/kernel/nvidia-580-open/nvidia-uvm.ko",
+    "version": "580.178.04",
+    "srcversion": "09F2A78862D06017E9324B6",
+    "signer": "Canonical Ltd. Kernel Module Signing",
+    "packing_parameter": false
+  },
+  "target_disk": {
+    "filename": "/lib/modules/7.0.0-1019-nvidia-64k/kernel/nvidia-580-open/nvidia-uvm.ko",
+    "version": "580.178.04",
+    "srcversion": "09F2A78862D06017E9324B6",
+    "signer": "Canonical Ltd. Kernel Module Signing",
+    "packing_parameter": false
+  },
+  "target_rm_version": "580.178.04",
+  "secure_boot": "SecureBoot enabled",
+  "manual_install": null,
+  "dkms": [],
+  "issues": [],
+  "unknowns": [],
+  "state": "stock-loaded"
+}
+{
+  "kernel": "7.0.0-1019-nvidia-64k",
+  "page_size": "65536",
+  "rm_version": "580.178.04",
+  "uvm_loaded": true,
+  "loaded_srcversion": "09F2A78862D06017E9324B6",
+  "packing": null,
+  "current_disk": {
+    "filename": "/lib/modules/7.0.0-1019-nvidia-64k/kernel/nvidia-580-open/nvidia-uvm.ko",
+    "version": "580.178.04",
+    "srcversion": "09F2A78862D06017E9324B6",
+    "signer": "Canonical Ltd. Kernel Module Signing",
+    "packing_parameter": false
+  },
+  "target_disk": {
+    "filename": "/lib/modules/7.0.0-1019-nvidia-64k/kernel/nvidia-580-open/nvidia-uvm.ko",
+    "version": "580.178.04",
+    "srcversion": "09F2A78862D06017E9324B6",
+    "signer": "Canonical Ltd. Kernel Module Signing",
+    "packing_parameter": false
+  },
+  "target_rm_version": "580.178.04",
+  "secure_boot": "SecureBoot enabled",
+  "manual_install": null,
+  "dkms": [],
+  "issues": [],
+  "unknowns": [],
+  "state": "stock-loaded"
+}
+6220ef63ef43322ae050fc563ee4d58397234a5c71a273dc5b6e632f1693d9fb  /lib/modules/7.0.0-1019-nvidia-64k/kernel/nvidia-580-open/nvidia-uvm.ko

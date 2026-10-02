@@ -325,8 +325,11 @@ builds, cleanup and default patch application without hardware access.
 
 An [isolated DKMS 3.4.3 add/build/sign check](validation.md#isolated-dkms-build-on-dgx1)
 passed on dgx1 using private state/source trees and a disposable, unenrolled key.
-The status command also passed on the live stock host. This release has **not**
-been installed, boot-tested or GPU-tested through DKMS on the three Sparks. A coordinated install/remove and
-boot validation remains the hardware acceptance step. See the
+The status command also passed on the live stock host. A subsequent
+[coordinated lifecycle test on dgx3](validation.md#installation-and-removal-on-dgx3)
+passed real system DKMS installation, Secure Boot, CUDA checks, removal and
+reboot into the restored stock module. It used the already-enrolled fleet key
+and previously installed kernel prerequisites; it did not repeat firmware key
+enrollment or test a new kernel/driver version. See the
 [upstream DKMS implementation](https://github.com/dkms-project/dkms/blob/v3.4.3/dkms.in)
 for signing, module backup and hook behavior.

@@ -1,0 +1,44 @@
+update-initramfs: Generating /boot/initrd.img-7.0.0-1019-nvidia-64k
+Installed /lib/modules/7.0.0-1019-nvidia-64k/updates/dgx-spark-memory-saver/nvidia-uvm.ko; not loaded. Run ./scripts/status before loading.
+{
+  "kernel": "7.0.0-1019-nvidia",
+  "page_size": "4096",
+  "rm_version": "580.178.04",
+  "uvm_loaded": true,
+  "loaded_srcversion": "09F2A78862D06017E9324B6",
+  "packing": null,
+  "current_disk": {
+    "filename": "/lib/modules/7.0.0-1019-nvidia/kernel/nvidia-580-open/nvidia-uvm.ko",
+    "version": "580.178.04",
+    "srcversion": "09F2A78862D06017E9324B6",
+    "signer": "Canonical Ltd. Kernel Module Signing",
+    "packing_parameter": false
+  },
+  "target_disk": {
+    "filename": "/lib/modules/7.0.0-1019-nvidia-64k/updates/dgx-spark-memory-saver/nvidia-uvm.ko",
+    "version": "580.178.04",
+    "srcversion": "34683B82C2D3339BBD2EEC9",
+    "signer": "DGX Fleet Secure Boot Module Signature key",
+    "packing_parameter": true
+  },
+  "target_rm_version": "580.178.04",
+  "secure_boot": "SecureBoot enabled",
+  "manual_install": {
+    "schema": 1,
+    "kernel": "7.0.0-1019-nvidia-64k",
+    "driver": "580.178.04",
+    "default_on": true,
+    "module_sha256": "0338565a4fe98b6930b658157eac908ec2cb4007d40dcf38d6602bb737c5d4a6",
+    "signed": true,
+    "signer": "DGX Fleet Secure Boot Module Signature key",
+    "certificate_sha256": "445045f0f33cedbe940fd7329afff11046b9530d2aab1494297880bdad589064",
+    "state": "installed",
+    "method": "manual",
+    "package_version": "0.2.0",
+    "destination": "/lib/modules/7.0.0-1019-nvidia-64k/updates/dgx-spark-memory-saver/nvidia-uvm.ko"
+  },
+  "dkms": [],
+  "issues": [],
+  "unknowns": [],
+  "state": "stock-loaded"
+}
