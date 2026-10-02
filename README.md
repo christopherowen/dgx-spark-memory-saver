@@ -16,7 +16,8 @@ page size, vLLM, model weights, arithmetic or serving configuration.
 | --- | --- |
 | See how much memory it saves | [Measurements and limitations](docs/validation.md) |
 | Install the 64 KiB kernel and prerequisites | [Kernel packages, swap and trial boot](docs/kernel.md) |
-| Build and sign the patched driver | [Build tools and Secure Boot](docs/installation.md) |
+| Build and sign the patched driver manually | [Build tools and Secure Boot](docs/installation.md) |
+| Install it persistently with DKMS | [DKMS, signing, activation and removal](docs/dkms.md) |
 | Try it and verify it is working | [Temporary trial and Secure Boot](docs/trial.md) |
 | Return to the stock driver or handle updates | [Updates and removal](docs/maintenance.md) |
 | Understand the allocation change | [Design and lifetime rules](docs/design.md) |
@@ -38,15 +39,19 @@ Root tables and other allocation sizes retain their original allocation.
 
 ## Activation and rollback
 
-The patch is disabled by default. Its opt-in parameter is
-`uvm_pack_sysmem_leaf_tables=1`. The path also requires 64 KiB CPU pages, coherent
-DMA, a real integrated GPU with no separate VRAM, a user page tree, and a
-256-byte table request. Other cases use the stock allocator.
+Choose the [manual trial](docs/trial.md) or [DKMS installation](docs/dkms.md).
+The manual build is disabled by default and uses the explicit parameter
+`uvm_pack_sysmem_leaf_tables=1`. Installing DKMS package `0.1.0` is the persistent
+opt-in: that build enables packing by default, supports only the pinned 64 KiB
+kernel, and registers only UVM. DKMS handles signing, installation and removal;
+its install/remove hooks refresh the target initramfs.
 
-[The trial procedure](docs/trial.md) describes the temporary module load,
-Secure Boot requirements, checks and rollback. This repository provides no
-persistent installer. In particular, do not set the new parameter globally:
-the stock 4 KiB UVM module does not recognize it.
+The path also requires coherent DMA, a real integrated GPU with no separate
+VRAM, a user page tree and a 256-byte table request. Other cases retain the stock
+allocator. No global modprobe parameter is installed, so stock modules on the
+4 KiB fallback do not receive an unknown option. Remove the DKMS override before
+upgrading NVIDIA packages. DKMS integration has hardware-free test coverage;
+its on-device install/remove and boot acceptance remains outstanding.
 
 ## Validation
 
@@ -78,8 +83,8 @@ This is an independent experimental project, unaffiliated with NVIDIA.
 ```
 
 These hardware-free checks verify the recorded artifact hashes, Python and shell
-syntax, patch parsing and local documentation links. GitHub Actions runs the
-same command. They never import the CUDA test programs or access a GPU.
+syntax, patch parsing, DKMS build/install guards and local documentation links.
+GitHub Actions runs the same command. They never import the CUDA test programs or access a GPU.
 Compilation on the target and the [hardware trial](docs/trial.md) are separate.
 See [contributing](CONTRIBUTING.md) for the evidence required when changing the
 allocator.
@@ -91,7 +96,8 @@ This is the development home for the patch originally tested in
 That repository retains its historical experiment snapshot.
 [provenance.json](provenance.json) records the source identity and copied-file
 hashes. The extracted patch and GPU tests are byte-identical to the tested
-versions; the build script's repository paths have been adapted.
+versions. The shared build helper verifies the same pins; the DKMS build
+applies a separate [default-on packaging patch](packaging/dkms-enable-packing.patch).
 
 No upstream submission or production promotion has been made. Driver/kernel
 updates require a new compatibility review. No signing keys or driver binaries

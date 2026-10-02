@@ -105,3 +105,18 @@ changed network latency and the Python source used for prefill. An apparent 10%
 prose TTFT gain from that comparison was rejected. The final dgx1-client control
 above resolves that confound. Earlier controls and the failed allocator-setting
 experiment remain in the original serving repository's historical experiment.
+
+## DKMS packaging (0.1.0)
+
+The packaging adds a default-on parameter assignment only for DKMS builds.
+The original patch and recorded GPU/benchmark files remain unchanged. Both
+patches were applied without fuzz to fresh copies of the pinned source: the
+result differs from the tested source only in that assignment and its comment.
+Hardware-free tests cover build isolation, source/package/header/driver checks,
+pre-install ownership checks, kernel exclusions, cleanup and initramfs refresh
+ordering. The actual fleet package paths and DKMS 3.4.3 were inspected read-only.
+
+These checks do not establish a DKMS target compilation, signing, installation,
+removal or reboot result. Those operations have not been performed on the
+Sparks for this packaging release. Follow the [DKMS acceptance procedure](dkms.md)
+in a coordinated maintenance window before deployment.

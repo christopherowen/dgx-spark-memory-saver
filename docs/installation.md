@@ -37,6 +37,12 @@ Already-prepared machines should verify those identities instead of repeating
 host preparation. CUDA development packages, PyTorch and bpftrace are **not**
 needed to compile this kernel module.
 
+## Choose an installation route
+
+For persistent installation, follow [DKMS setup](dkms.md). DKMS handles module
+signing itself, using the enrolled key established below; do not manually sign
+DKMS build output. The remaining steps on this page describe the manual trial.
+
 ## 2. Build the patched UVM module
 
 From the checkout root as your ordinary user:
@@ -131,8 +137,8 @@ require disabling Secure Boot.
 
 Continue at [the one-shot kernel boot](kernel.md#6-boot-once-into-64-kib), then
 [load and verify the replacement UVM module](trial.md#load-and-verify).
-Copying or signing a module does not activate it. There is no persistent UVM
-installer or DKMS registration in this project.
+Copying or signing a module does not activate it. This manual route makes no
+persistent installation; [DKMS](dkms.md) provides that separate route.
 
 For the GPU tests, use an existing compatible CUDA/PyTorch environment: the
 recorded test used PyTorch `2.13.0+cu130` in the serving image. Its exact image

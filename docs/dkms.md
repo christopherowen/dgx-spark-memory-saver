@@ -1,0 +1,237 @@
+# Install with DKMS
+
+[← README](../README.md) · [Kernel setup](kernel.md) · [Manual build/sign](installation.md) · [Removal](#remove-and-restore-stock-uvm)
+
+This follows fan-control's **source registration → DKMS build/sign → install →
+load/verify** workflow. It targets Ubuntu/DGX OS with DKMS 3.x (interfaces reviewed
+against 3.0.11 and the fleet's 3.4.3). Installing this package is the persistent
+opt-in: its UVM module defaults to packing eligible tables. There is no global
+modprobe option and no new boot service. CUDA clients load UVM normally.
+
+**Supported combination:** Linux aarch64, `7.0.0-1019-nvidia-64k`, NVIDIA
+`580.178.04`, source package `580.178.04-0ubuntu0.24.04.1`, and the matching
+precompiled NVIDIA kernel-module package. Other kernels, including the 4 KiB
+fallback, are excluded. `AUTOINSTALL=yes` supports this exact combination;
+future kernel/driver versions require an updated, validated compatibility pin.
+
+DKMS packages only `nvidia-uvm`. The build also compiles RM to resolve its symbols,
+but DKMS does not install that RM output. The packaged NVIDIA RM, modeset, DRM
+and peermem remain authoritative. A separate NVIDIA DKMS package is not supported
+alongside this replacement: two DKMS packages must not own the same UVM module.
+
+## 1. Prepare the host
+
+Complete [kernel and package setup](kernel.md) through the preboot checks.
+Run `./scripts/check` in this checkout. The host must have the pinned headers,
+NVIDIA source and precompiled modules, Python 3, GCC 13 and the other listed
+build tools. Then check:
+
+```sh
+sudo apt-get --no-remove install dkms openssl mokutil
+dkms --version
+dkms status
+modinfo -k 7.0.0-1019-nvidia-64k -F filename nvidia_uvm
+modinfo -k 7.0.0-1019-nvidia-64k -F version nvidia
+```
+
+Before first installation, UVM should resolve to the packaged file under
+`kernel/nvidia-580-open/`, not a manual override or another DKMS package. Restore
+stock and unload any temporarily loaded trial module in a maintenance window.
+Building does not need a reboot or GPU access. Installing changes future module
+loads and initramfs, so install/remove only with GPU clients stopped.
+
+## 2. Configure DKMS signing
+
+Use the [existing-key or enrollment instructions](installation.md#3-sign-for-secure-boot)
+if needed. DKMS signs the module itself; do not run the manual `sign-file` step
+on DKMS output. A certificate must be enrolled on every target machine.
+
+Inspect existing settings before changing them:
+
+```sh
+sudo grep -H -E '^[[:space:]]*(mok_signing_key|mok_certificate)=' \
+  /etc/dkms/framework.conf /etc/dkms/framework.conf.d/*.conf
+```
+
+Absent files or no matches can be normal. If fan-control already uses an
+explicit enrolled key, retain that setup and verify the configured certificate
+with `sudo mokutil --test-key /actual/path/to/MOK.der`. These are system-wide
+settings shared by DKMS modules, not settings private to memory-saver.
+
+For a new signing setup, keep the key in a persistent root-owned directory. Set
+`DGX_MOK_DIR` to the already-created and enrolled pair from the signing guide:
+
+```sh
+sudo install -d -m 0700 /root/.local/share/dgx-spark-memory-saver/keys
+sudo install -m 0600 "$DGX_MOK_DIR/MOK.priv" \
+  /root/.local/share/dgx-spark-memory-saver/keys/MOK.priv
+sudo install -m 0644 "$DGX_MOK_DIR/MOK.der" \
+  /root/.local/share/dgx-spark-memory-saver/keys/MOK.der
+sudo mokutil --test-key /root/.local/share/dgx-spark-memory-saver/keys/MOK.der
+sudoedit /etc/dkms/framework.conf
+```
+
+Set these entries, preserving unrelated settings and checking that no drop-in
+overrides them:
+
+```sh
+mok_signing_key="/root/.local/share/dgx-spark-memory-saver/keys/MOK.priv"
+mok_certificate="/root/.local/share/dgx-spark-memory-saver/keys/MOK.der"
+```
+
+Do not replace an existing signing identity merely to use these example paths.
+Verify the actual key/certificate paths printed by DKMS during the build.
+On systems intentionally running without signature enforcement, enrollment is
+not required; this project does not disable Secure Boot.
+
+## 3. Register only the build inputs
+
+Version `0.1.0` is the DKMS package version, independent of NVIDIA's module
+version `580.178.04`. From the checkout root:
+
+```bash
+(
+  set -euo pipefail
+  destination=/usr/src/dgx-spark-memory-saver-0.1.0
+  test ! -e "$destination"
+  sudo install -d "$destination/scripts" "$destination/patches" "$destination/packaging"
+  sudo install -m 0644 dkms.conf provenance.json "$destination/"
+  sudo install -m 0755 scripts/driver-build scripts/refresh-initramfs "$destination/scripts/"
+  sudo install -m 0644 patches/0001-pack-user-leaf-tables.patch "$destination/patches/"
+  sudo install -m 0644 packaging/dkms-enable-packing.patch "$destination/packaging/"
+)
+sudo dkms add -m dgx-spark-memory-saver -v 0.1.0
+```
+
+This copies no keys, binaries, results, `.work` directory or NVIDIA source tree.
+The build reads the package-managed NVIDIA source, verifies its fingerprints,
+and patches an isolated copy inside DKMS's build directory.
+
+## 4. Build and install
+
+```sh
+sudo dkms build -m dgx-spark-memory-saver -v 0.1.0 -k 7.0.0-1019-nvidia-64k
+sudo dkms install -m dgx-spark-memory-saver -v 0.1.0 -k 7.0.0-1019-nvidia-64k
+dkms status -m dgx-spark-memory-saver
+modinfo -k 7.0.0-1019-nvidia-64k -F filename nvidia_uvm
+modinfo -k 7.0.0-1019-nvidia-64k -F version nvidia_uvm
+modinfo -k 7.0.0-1019-nvidia-64k -F vermagic nvidia_uvm
+modinfo -k 7.0.0-1019-nvidia-64k -F signer nvidia_uvm
+modinfo -k 7.0.0-1019-nvidia-64k -p nvidia_uvm
+```
+
+Expect `installed`, an `updates/dkms/nvidia-uvm.ko` path (possibly compressed),
+NVIDIA version `580.178.04`, matching kernel vermagic, the intended signer and
+`uvm_pack_sysmem_leaf_tables` among the parameters. The kernel and source
+fingerprints are checked during build; the pre-install hook rechecks them and
+the packaged RM/UVM even when DKMS reuses an earlier binary.
+
+Do not use `--force` to bypass a failed pre-install check. NVIDIA's version
+string is preserved, but the patched source version differs; DKMS supports that
+replacement. A version refusal needs inspection, not an automatic override.
+
+Install/remove hooks run `depmod` before updating the existing target initramfs.
+DKMS versions differ in how they surface post-hook failures: inspect hook output
+and require the following explicit refresh to succeed before loading/rebooting:
+
+```sh
+sudo depmod 7.0.0-1019-nvidia-64k
+sudo update-initramfs -u -k 7.0.0-1019-nvidia-64k
+```
+
+On newer DKMS, the original module is archived with its path for restoration;
+older Ubuntu DKMS leaves the packaged file in place beneath the override. Keep
+the DKMS state directory intact. Do not manually delete its `original_module`
+backup or copy over packaged files.
+
+## 5. Load and verify
+
+Boot the candidate kernel using [the one-shot procedure](kernel.md#6-boot-once-into-64-kib)
+if necessary, then complete its swap, CPU governor and network checks. With GPU
+clients stopped, verify that `sudo fuser /dev/nvidia-uvm` reports no users.
+On the candidate kernel:
+
+```sh
+uname -r
+getconf PAGESIZE
+sudo modprobe -r nvidia_uvm
+sudo modprobe nvidia_uvm
+cat /sys/module/nvidia_uvm/parameters/uvm_pack_sysmem_leaf_tables
+cat /sys/module/nvidia_uvm/srcversion
+```
+
+Require the target kernel, 65,536-byte pages and packing value `Y`. This defaults
+to `Y` only in the DKMS build. The manual trial still uses an explicit `=1`.
+The allocator's hardware predicates remain unchanged; parameter presence alone
+does not prove that packing actually occurred. Run the [hardware validation](trial.md#validate)
+and memory checks before production use. On a cluster, check every rank before
+restarting distributed serving.
+
+For diagnosis on this patched module, loading with
+`sudo modprobe nvidia_uvm uvm_pack_sysmem_leaf_tables=0` disables packing until
+it is next reloaded. Do not put the custom parameter in a global modprobe file:
+the stock module does not recognize it.
+
+## Updates
+
+`git pull` updates the checkout, not `/usr/src` or DKMS's registered source.
+For a new project version, remove the old registration as below, then copy and
+register the new version using its `dkms.conf`. Do not overwrite registered
+source while its module is installed. For a changed checkout retaining `0.1.0`,
+remove that registration and its source directory before copying it afresh.
+
+**Remove memory-saver before upgrading NVIDIA packages.** Build exclusions and
+pre-install checks prevent new mismatched installations; they cannot unload or
+remove a previously installed override merely because a later driver upgrade
+changes RM. Never leave this UVM override shadowing a newer NVIDIA driver.
+Restore the packaged driver, perform the upgrade, and use stock until that new
+combination is supported. DKMS skips other kernels rather than promising
+compatibility with an untested version. Preserve the 4 KiB fallback.
+
+## Remove and restore stock UVM
+
+In a maintenance window, stop GPU clients. If the patched module is loaded on
+the running kernel, unload it first; do not force-unload an in-use module.
+Then remove the package from all registered kernels:
+
+```sh
+sudo modprobe -r nvidia_uvm
+sudo dkms remove -m dgx-spark-memory-saver -v 0.1.0 --all
+sudo depmod 7.0.0-1019-nvidia-64k
+sudo update-initramfs -u -k 7.0.0-1019-nvidia-64k
+modinfo -k 7.0.0-1019-nvidia-64k -F filename nvidia_uvm
+modinfo -k 7.0.0-1019-nvidia-64k -F version nvidia_uvm
+modinfo -k 7.0.0-1019-nvidia-64k -p nvidia_uvm
+```
+
+Require the packaged UVM path, the expected NVIDIA version, and absence of
+`uvm_pack_sysmem_leaf_tables`. If stock restoration failed, repair the exact
+precompiled package before loading anything:
+
+```sh
+sudo env NEEDRESTART_MODE=l apt-get --no-remove --reinstall install \
+  linux-modules-nvidia-580-open-7.0.0-1019-nvidia-64k=7.0.0-1019.19~24.04.2+1
+sudo depmod 7.0.0-1019-nvidia-64k
+sudo update-initramfs -u -k 7.0.0-1019-nvidia-64k
+```
+
+Repeat the identity checks, then `sudo modprobe nvidia_uvm` for the running
+kernel. Verify CUDA/serving before resuming use. Rebooting alone does not remove
+an installed DKMS override. After successful removal, the registered source
+`/usr/src/dgx-spark-memory-saver-0.1.0` may be deleted separately. Keep shared
+signing keys and DKMS signing settings if fan-control or other modules use them.
+
+## Validation boundary
+
+The allocator patch retains its recorded GPU validation. DKMS adds a separate
+two-line source change (comment and default value), build orchestration, signing
+through DKMS, and install/remove hooks. The repository tests exercise rejection
+of mismatched packages/headers/source, conflicting module ownership, isolated
+builds, cleanup and default patch application without hardware access.
+
+The actual fleet's package paths, header identities and DKMS version were
+inspected read-only. This release has **not** been installed, boot-tested or
+GPU-tested through DKMS on the three Sparks. A coordinated install/remove and
+boot trial remains the hardware acceptance step. See the
+[upstream DKMS implementation](https://github.com/dkms-project/dkms/blob/v3.4.3/dkms.in)
+for signing, module backup and hook behavior.

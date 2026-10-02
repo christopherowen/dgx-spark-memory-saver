@@ -2,6 +2,9 @@
 
 [← README](../README.md) · [Build](installation.md) · [Temporary trial](trial.md)
 
+For an installed DKMS build, use [DKMS removal and restoration](dkms.md#remove-and-restore-stock-uvm).
+The temporary-load procedure below applies only to the manual trial.
+
 ## Return to the packaged driver
 
 The [temporary trial](trial.md#roll-back) loads a module directly from the build
@@ -70,7 +73,8 @@ memory measurements. Do not bypass the source checks or copy a module built
 for a different kernel. Use the packaged driver while a new combination is
 unverified.
 
-Persistent installation and automatic rebuilds are not implemented. They would
-need matching NVIDIA RM/UVM versions, signing, conditional activation only on
-the compatible kernel, and a working stock fallback. In particular, a global
-`uvm_pack_sysmem_leaf_tables` option breaks stock modules that lack the parameter.
+[DKMS](dkms.md) provides persistent installation for the pinned combination.
+Its build exclusions skip unvalidated kernels. Remove the DKMS override before
+NVIDIA driver updates: checks on new builds do not remove a previously installed
+binary after RM changes. Installing through DKMS does not change the stock GRUB
+default or install a global modprobe parameter.

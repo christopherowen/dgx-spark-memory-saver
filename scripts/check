@@ -3,4 +3,7 @@
 set -euo pipefail
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 python3 -m unittest discover -s "${root}/tests" -p 'test_*.py' -v
-bash -n "${root}/scripts/check" "${root}/scripts/build.sh"
+for file in "${root}/scripts/check" "${root}/scripts/build.sh" \
+  "${root}/scripts/refresh-initramfs" "${root}/dkms.conf"; do
+  bash -n "$file"
+done

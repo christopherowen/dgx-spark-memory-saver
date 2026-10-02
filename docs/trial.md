@@ -3,6 +3,8 @@
 First complete [kernel and prerequisite setup](kernel.md) and
 [build and signing](installation.md). These are operator instructions, not an
 automatic installation procedure.
+These commands assume the manual route, with no memory-saver DKMS override
+installed. If using DKMS, follow [DKMS load/removal](dkms.md) instead.
 Coordinate an exclusive window and stop all GPU clients before changing UVM.
 For distributed serving, every rank must use the same kernel and module.
 Retain a known-working stock kernel and a recovery path.
@@ -105,8 +107,8 @@ boot path; the recorded fleet retained 4 KiB as its normal default.
 Verify that the custom parameter is absent and that all nodes agree before
 restoring distributed serving.
 
-Persistent integration is intentionally separate. It needs an exact signed
-artifact, conditional activation for the matching kernel, an intact stock
-fallback, and checks for driver/kernel upgrades. A global modprobe parameter
-would break stock UVM versions that do not recognize it. No persistent installer
-or production promotion is included here.
+Persistent installation is available through [DKMS](dkms.md). Its default-on
+build and installed override have their own removal procedure; do not use the
+manual rollback to claim a DKMS installation has been removed. A global modprobe
+parameter would break stock UVM versions that do not recognize it. No production
+promotion is implied by adding the DKMS packaging.

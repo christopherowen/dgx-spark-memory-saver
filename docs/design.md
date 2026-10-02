@@ -34,11 +34,15 @@ DMA address and frees the backing page, rather than unmapping a suballocation.
 
 All of these must hold:
 
-- `uvm_pack_sysmem_leaf_tables=1` (read-only module parameter, default off).
+- `uvm_pack_sysmem_leaf_tables=1` (read-only module parameter).
 - CPU page size is exactly 65,536 bytes.
 - The request is exactly 256 bytes in a user page tree.
 - There is a real PCI device, marked as an integrated GPU with no separate VRAM.
 - The device uses coherent DMA.
+
+The historical/manual patch defaults the parameter off. The separate DKMS
+packaging patch defaults it on: installation is the persistent opt-in. No
+allocator condition or synchronization changes between the two builds.
 
 The tested hardware is GB10. The predicates are not a compatibility claim for
 other integrated GPUs. Unsupported cases retain the original allocator.

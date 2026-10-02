@@ -122,7 +122,8 @@ sudo update-grub
 `linux-tools` is needed by the Spark's CPU governor service; omitting it caused
 an actual failure in the first trial. `psmisc` provides `fuser` for the UVM load
 checks. `dkms autoinstall` rebuilds modules **already registered on your host**;
-it does not register this project's UVM patch. If you use
+it includes this project only after you have separately registered it through
+[the memory-saver DKMS setup](dkms.md). If you use
 [dgx-spark-fan-control](https://github.com/christopherowen/dgx-spark-fan-control),
 verify its DKMS build and enrolled signing certificate for the new kernel too.
 Resolve failed DKMS builds before proceeding.
@@ -244,7 +245,8 @@ Require `7.0.0-1019-nvidia-64k`, `65536`, driver `580.178.04`, and working
 network/fan/CPU governor services. On the tested hosts the CPU governors read
 `performance`. Skip manual `swapon` if the correct file is already active.
 The package installation initially gives you **stock UVM on a 64 KiB kernel**;
-packing is not active until you follow [load and verify](trial.md#load-and-verify).
+packing is not active until you follow [manual load and verify](trial.md#load-and-verify)
+or install and verify the [DKMS build](dkms.md#5-load-and-verify).
 
 ### Reproduce the measured memory profile
 
