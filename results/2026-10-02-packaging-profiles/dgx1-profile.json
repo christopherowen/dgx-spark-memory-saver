@@ -1,0 +1,23 @@
+{
+  "manifest": "provenance.json",
+  "patch": "patches/0001-pack-user-leaf-tables.patch",
+  "patch_sha256": "33d9906c91be277de4ad74632b0dd5b87dab24e62256dcf382008e2551740319",
+  "kernels": {
+    "7.0.0-1019-nvidia-64k": {
+      "module_package_version": "7.0.0-1019.19~24.04.2+1"
+    }
+  },
+  "qualification": "validated",
+  "driver": "580.178.04",
+  "upstream": {
+    "repository": "https://github.com/NVIDIA/open-gpu-kernel-modules",
+    "tag": "580.178.04",
+    "package": "nvidia-kernel-source-580-open",
+    "package_version": "580.178.04-0ubuntu0.24.04.1",
+    "source_root": "/usr/src/nvidia-580.178.04",
+    "file_sha256": {
+      "nvidia-uvm/uvm_mmu.c": "61dcbb1826e6104452d82d319b5b8c810e328e6a606f619e0efaa273d162bdea",
+      "nvidia-uvm/uvm_mmu.h": "9676e8dd2e3ce37390fdac6a8dd18d728d23e81ce4f47f7978971928ec9ba419"
+    }
+  }
+}

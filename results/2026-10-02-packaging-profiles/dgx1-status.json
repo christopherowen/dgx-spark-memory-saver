@@ -1,0 +1,34 @@
+{
+  "kernel": "7.0.0-1019-nvidia-64k",
+  "page_size": "65536",
+  "rm_version": "580.178.04",
+  "uvm_loaded": true,
+  "loaded_srcversion": "34683B82C2D3339BBD2EEC9",
+  "packing": "Y",
+  "current_disk": {
+    "filename": "/lib/modules/7.0.0-1019-nvidia-64k/updates/dkms/nvidia-uvm.ko.zst",
+    "version": "580.178.04",
+    "srcversion": "34683B82C2D3339BBD2EEC9",
+    "signer": "DGX Fleet Secure Boot Module Signature key",
+    "packing_parameter": true
+  },
+  "target_disk": {
+    "filename": "/lib/modules/7.0.0-1019-nvidia-64k/updates/dkms/nvidia-uvm.ko.zst",
+    "version": "580.178.04",
+    "srcversion": "34683B82C2D3339BBD2EEC9",
+    "signer": "DGX Fleet Secure Boot Module Signature key",
+    "packing_parameter": true
+  },
+  "target_kernel": "7.0.0-1019-nvidia-64k",
+  "target_rm_version": "580.178.04",
+  "secure_boot": "SecureBoot enabled",
+  "manual_install": null,
+  "dkms": [
+    "dgx-spark-memory-saver/0.2.0, 7.0.0-1019-nvidia-64k, aarch64: installed (Original modules exist)"
+  ],
+  "issues": [],
+  "unknowns": [],
+  "qualification": "validated",
+  "caveat": null,
+  "state": "packing-enabled"
+}

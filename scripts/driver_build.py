@@ -143,6 +143,8 @@ def build(kernel, headers, dkms=False):
     run('patch', '-d', str(WORK), '-p1', '--fuzz=0', '--batch', '-i',
         str(repository_file(profile['patch'])))
     if dkms:
+        # Persistent installation is the opt-in. Keep the allocator predicates
+        # and runtime =0 override; stock modules receive no global parameter.
         run('patch', '-d', str(WORK), '-p1', '--fuzz=0', '--batch', '-i',
             str(ROOT / 'packaging/enable-packing.patch'))
     run('make', '-C', str(WORK), '-j4', 'CC=' + kernel_profile(kernel)['compiler'],
@@ -163,6 +165,7 @@ def build(kernel, headers, dkms=False):
 def refresh_initramfs(kernel):
     kernel_profile(kernel)
     if (BOOT / ('initrd.img-' + kernel)).exists():
+        # DKMS hooks precede its final depmod; refresh the index first.
         run('depmod', kernel)
         run('update-initramfs', '-u', '-k', kernel)
     else:

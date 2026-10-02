@@ -82,3 +82,9 @@ applied, and the allocator code edits match exactly. The
 [source-check receipt](../results/2026-10-02-packaging-profiles/source-check.json)
 records the resulting hashes. This change has not been installed or loaded on
 the fleet; the existing R580/0.2.0 production installation is unchanged.
+
+All 43 hardware-free tests pass. The published builder's read-only `check` and
+`status --json` also passed on dgx1, selecting R580 and confirming the existing
+signed 0.2.0 installation with packing enabled. Their receipts are
+[profile selection](../results/2026-10-02-packaging-profiles/dgx1-profile.json)
+and [loaded state](../results/2026-10-02-packaging-profiles/dgx1-status.json).
