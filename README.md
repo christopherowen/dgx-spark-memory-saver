@@ -15,7 +15,8 @@ page size, vLLM, model weights, arithmetic or serving configuration.
 | I want to… | Guide |
 | --- | --- |
 | See how much memory it saves | [Measurements and limitations](docs/validation.md) |
-| Build the patched driver | [Source, requirements and build](docs/installation.md) |
+| Install the 64 KiB kernel and prerequisites | [Kernel packages, swap and trial boot](docs/kernel.md) |
+| Build and sign the patched driver | [Build tools and Secure Boot](docs/installation.md) |
 | Try it and verify it is working | [Temporary trial and Secure Boot](docs/trial.md) |
 | Return to the stock driver or handle updates | [Updates and removal](docs/maintenance.md) |
 | Understand the allocation change | [Design and lifetime rules](docs/design.md) |
@@ -65,8 +66,8 @@ Page-table bugs can corrupt GPU memory; build success alone is not validation.
 Validated on NVIDIA DGX Spark (GB10, Linux aarch64), NVIDIA open driver
 `580.178.04-0ubuntu0.24.04.1`, and Ubuntu kernel `7.0.0-1019-nvidia-64k`.
 The build verifies the exact source package and both patched source files.
-Other kernel and driver versions have not been validated. A 64 KiB kernel must
-already be available; this project does not build or install Linux itself.
+Other kernel and driver versions have not been validated. The [kernel setup guide](docs/kernel.md) installs the tested distribution
+packages. The driver build script does not build or install Linux itself.
 
 This is an independent experimental project, unaffiliated with NVIDIA.
 

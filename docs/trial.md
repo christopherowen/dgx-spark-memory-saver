@@ -1,6 +1,8 @@
 # Temporary driver trial
 
-These are operator instructions, not an automatic installation procedure.
+First complete [kernel and prerequisite setup](kernel.md) and
+[build and signing](installation.md). These are operator instructions, not an
+automatic installation procedure.
 Coordinate an exclusive window and stop all GPU clients before changing UVM.
 For distributed serving, every rank must use the same kernel and module.
 Retain a known-working stock kernel and a recovery path.

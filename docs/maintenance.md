@@ -14,6 +14,43 @@ Once stock UVM is restored, the ignored `.work` build directory or the entire
 checkout can be removed. Keep locally enrolled signing keys if other modules
 use them; removing this project does not require changing Secure Boot.
 
+## Return to the stock kernel
+
+For the manual kernel trial, stop GPU clients and reboot normally. The explicit
+stock GRUB default remains in place and the one-shot candidate selection has
+been consumed. A module loaded with `insmod` is not carried across the reboot.
+Confirm:
+
+```sh
+uname -r
+getconf PAGESIZE
+cat /sys/module/nvidia/version
+nvidia-smi
+systemctl --failed
+swapon --show
+```
+
+Expect `7.0.0-1019-nvidia`, `4096` and NVIDIA `580.178.04`. If you followed the
+manual `noauto` swap procedure, run `sudo swapon /swap.img` when the original
+file is not already active. Do not activate `/swap-64k.img` on this kernel.
+Restore the original swap entry's options in `/etc/fstab` and remove the
+trial `/swap-64k.img` entry, using the saved
+`/var/lib/dgx-spark-memory-saver/preparation/fstab` as a reference. Preserve
+unrelated edits made since the backup. Run `sudo systemctl daemon-reload`.
+
+The temporary THP and free-memory settings disappear at reboot unless another
+service applies them. Verify the original policy and all nodes' agreement
+before resuming serving. A host already using a page-aware swap/policy service
+should return through its existing procedure instead of duplicating it.
+
+The kernel packages may remain installed. Keep the explicit stock GRUB pin
+while they do: removing the pin can make the newer candidate the default again.
+Removing kernels or restoring an older GRUB policy is a separate maintenance
+operation; inspect the generated default before rebooting. Never remove the
+running or known-working fallback kernel. The GRUB backups are under the same
+preparation directory. A normal reboot is not recovery from a hung host; use
+the console to select the known-working entry if needed.
+
 ## Update the project
 
 Restore stock UVM between trials, then update the checkout and run
