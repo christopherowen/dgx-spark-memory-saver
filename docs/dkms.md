@@ -86,22 +86,25 @@ not required; this project does not disable Secure Boot.
 
 ## 3. Register only the build inputs
 
-Version `0.2.0` is the DKMS package version, independent of NVIDIA's module
-version `580.178.04`. From the checkout root:
+Version `0.4.0` is the DKMS package version, independent of NVIDIA's module
+version. These commands retain the production R580 package setup; the same build
+helper selects R610 when that reviewed profile is installed. Read its
+[conditional requirements](driver-610.md) before using R610. From the checkout root:
 
 ```bash
 (
   set -euo pipefail
-  destination=/usr/src/dgx-spark-memory-saver-0.2.0
+  destination=/usr/src/dgx-spark-memory-saver-0.4.0
   test ! -e "$destination"
   sudo install -d "$destination/scripts" "$destination/patches" "$destination/packaging"
-  sudo install -m 0644 dkms.conf provenance.json "$destination/"
+  sudo install -m 0644 dkms.conf compatibility.json provenance.json provenance-610.json "$destination/"
   sudo install -m 0755 scripts/driver-build scripts/refresh-initramfs "$destination/scripts/"
   sudo install -m 0644 scripts/driver_build.py "$destination/scripts/"
-  sudo install -m 0644 patches/0001-pack-user-leaf-tables.patch "$destination/patches/"
+  sudo install -m 0644 patches/0001-pack-user-leaf-tables.patch \
+    patches/0002-pack-user-leaf-tables-610.patch "$destination/patches/"
   sudo install -m 0644 packaging/enable-packing.patch "$destination/packaging/"
 )
-sudo dkms add -m dgx-spark-memory-saver -v 0.2.0
+sudo dkms add -m dgx-spark-memory-saver -v 0.4.0
 ```
 
 This copies no keys, binaries, results, `.work` directory or NVIDIA source tree.
@@ -111,8 +114,8 @@ and patches an isolated copy inside DKMS's build directory.
 ## 4. Build and install
 
 ```sh
-sudo dkms build -m dgx-spark-memory-saver -v 0.2.0 -k 7.0.0-1019-nvidia-64k
-sudo dkms install -m dgx-spark-memory-saver -v 0.2.0 -k 7.0.0-1019-nvidia-64k
+sudo dkms build -m dgx-spark-memory-saver -v 0.4.0 -k 7.0.0-1019-nvidia-64k
+sudo dkms install -m dgx-spark-memory-saver -v 0.4.0 -k 7.0.0-1019-nvidia-64k
 dkms status -m dgx-spark-memory-saver
 modinfo -k 7.0.0-1019-nvidia-64k -F filename nvidia_uvm
 modinfo -k 7.0.0-1019-nvidia-64k -F version nvidia_uvm
@@ -125,7 +128,9 @@ Expect `installed`, an `updates/dkms/nvidia-uvm.ko` path (possibly compressed),
 NVIDIA version `580.178.04`, matching kernel vermagic, the intended signer and
 `uvm_pack_sysmem_leaf_tables` among the parameters. The kernel and source
 fingerprints are checked during build; the pre-install hook rechecks them and
-the packaged RM/UVM even when DKMS reuses an earlier binary.
+the packaged RM/UVM and the actual cached DKMS artifact even when DKMS reuses
+an earlier binary. A cached R580 artifact cannot be installed beside R610.
+The kernel exclusion is generated from the shared compatibility table.
 
 Do not use `--force` to bypass a failed pre-install check. NVIDIA's version
 string is preserved, but the patched source version differs; DKMS supports that
@@ -179,14 +184,15 @@ the stock module does not recognize it.
 
 ## Updates
 
-To migrate from `0.1.0`, remove that exact registration using `-v 0.1.0`,
-verify stock restoration, and then register `0.2.0`. Do not overwrite the old
+To migrate from `0.1.0`, `0.2.0` or the experimental `0.3.0`, remove that exact
+registration using its recorded version,
+verify stock restoration, and then register `0.4.0`. Do not overwrite the old
 registered source or delete DKMS backup directories.
 
 `git pull` updates the checkout, not `/usr/src` or DKMS's registered source.
 For a new project version, remove the old registration as below, then copy and
 register the new version using its `dkms.conf`. Do not overwrite registered
-source while its module is installed. For a changed checkout retaining `0.2.0`,
+source while its module is installed. For a changed checkout retaining `0.4.0`,
 remove that registration and its source directory before copying it afresh.
 
 **Remove memory-saver before upgrading NVIDIA packages.** Build exclusions and
@@ -211,7 +217,7 @@ uname -r
 dkms status -m dgx-spark-memory-saver
 ```
 
-The commands below remove version `0.2.0`. If status reports a different
+The commands below remove version `0.4.0`. If status reports a different
 version, use that exact version in the removal and source-cleanup commands.
 Stop here if DKMS reports a broken registration: preserve its source and
 `original_module` backup while repairing the registration. Do not delete those
@@ -238,7 +244,7 @@ need not be unloaded to remove the candidate kernel's on-disk override.
 ```bash
 (
   set -e
-  sudo dkms remove -m dgx-spark-memory-saver -v 0.2.0 --all
+  sudo dkms remove -m dgx-spark-memory-saver -v 0.4.0 --all
   sudo depmod 7.0.0-1019-nvidia-64k
   sudo update-initramfs -u -k 7.0.0-1019-nvidia-64k
 )
@@ -306,7 +312,7 @@ every rank before restarting them together.
 Only after DKMS status is clear and stock restoration is verified:
 
 ```sh
-sudo rm -rf -- /usr/src/dgx-spark-memory-saver-0.2.0
+sudo rm -rf -- /usr/src/dgx-spark-memory-saver-0.4.0
 ```
 
 The ordinary checkout and its `.work` build directory can then be removed too,
@@ -317,7 +323,10 @@ so there is none to disable or delete.
 
 ## Validation boundary
 
-The allocator patch retains its recorded GPU validation. DKMS adds a separate
+The allocator patches retain their recorded GPU validation. Version 0.4.0
+packaging has hardware-free orchestration tests and exact packaged-source patch
+checks for R580 and R610; its own on-device install/remove cycle has not been run.
+The hardware lifecycle evidence below belongs to version 0.2.0. DKMS adds a separate
 two-line source change (comment and default value), build orchestration, signing
 through DKMS, and install/remove hooks. The repository tests exercise rejection
 of mismatched packages/headers/source, conflicting module ownership, isolated

@@ -3,7 +3,7 @@
 [← README](../README.md) · [Prerequisites and signing](installation.md) · [Status and usage](usage.md) · [DKMS alternative](dkms.md)
 
 This route installs a signed UVM override persistently for the pinned 64 KiB
-kernel. It survives reboot but does not rebuild automatically. Choose this
+kernel selected with `--kernel` (the reviewed 64 KiB kernel by default). It survives reboot but does not rebuild automatically. Choose this
 route **or DKMS**, not both. Neither installer changes the kernel boot default
 or loads a module. CUDA clients load the selected UVM normally.
 
@@ -19,7 +19,7 @@ From the checkout as the key's owner:
 Set `DGX_MOK_DIR` if using an existing signing key. The helper verifies key mode
 0600, key/certificate agreement, expiry and enrollment before compiling. It
 builds in an isolated source copy, enables packing by default, signs UVM and
-records the exact artifact hash in `.work/nvidia-580.178.04-uvm-pool/build.json`.
+records the exact artifact hash in `.work/uvm/build.json`.
 The public certificate is copied alongside the module; the private key is not.
 An existing build directory must first be removed with
 `./scripts/driver-build clean` after preserving any needed results.
@@ -114,5 +114,5 @@ does not uninstall a persistent manual override.
 Remove the old manual installation before building/installing a replacement or
 registering DKMS. Conversely, remove the DKMS registration and verify stock UVM
 before installing manually. Remove this override **before NVIDIA driver updates**;
-a cached UVM binary does not become compatible when RM changes. Other kernel
-versions remain unsupported until explicitly reviewed and validated.
+a cached UVM binary does not become compatible when RM changes. Additional driver/kernel combinations are registered in
+[the compatibility table](compatibility.md) after review and validation.

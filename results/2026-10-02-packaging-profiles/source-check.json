@@ -1,0 +1,29 @@
+{
+  "checks": [
+    {
+      "driver": "580.178.04",
+      "source_hashes_verified": true,
+      "allocator_patch": "patches/0001-pack-user-leaf-tables.patch",
+      "patch_sha256": "33d9906c91be277de4ad74632b0dd5b87dab24e62256dcf382008e2551740319",
+      "default_on_applied": true,
+      "patched_files": {
+        "nvidia-uvm/uvm_mmu.c": "45b9767931c5ed0f3d5eddef71b1e3934d3574a9817495c88f5fe066bd0d1d19",
+        "nvidia-uvm/uvm_mmu.h": "4d6c7644b355726e30b6de2a8e7340b87081e24810c1ed0a07aad45d7453a5cf"
+      }
+    },
+    {
+      "driver": "610.57.04",
+      "source_hashes_verified": true,
+      "allocator_patch": "patches/0002-pack-user-leaf-tables-610.patch",
+      "patch_sha256": "d1d90604614b86b33c11c9366daafbe0981e84653a7e4881328734711ad2dcaf",
+      "default_on_applied": true,
+      "patched_files": {
+        "nvidia-uvm/uvm_mmu.c": "ff755e05e09e9677a9ccc9cb5b18e13a0e14d8e4688e86696ab6414c235f1ed8",
+        "nvidia-uvm/uvm_mmu.h": "290f5d815ca8f819429e7dddc24c8f1499e881310cfd00522dd8990004bbc312"
+      }
+    }
+  ],
+  "allocator_edits_identical": true,
+  "compiled": false,
+  "installed": false
+}

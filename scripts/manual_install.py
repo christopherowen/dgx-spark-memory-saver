@@ -14,9 +14,10 @@ import tempfile
 import driver_build as driver
 import signing
 
+KERNEL = driver.KERNEL
 STATE = Path('/var/lib/dgx-spark-memory-saver')
-RECEIPT = STATE / ('manual-' + driver.KERNEL + '.json')
-DESTINATION = Path('/lib/modules') / driver.KERNEL / 'updates/dgx-spark-memory-saver/nvidia-uvm.ko'
+RECEIPT = STATE / ('manual-' + KERNEL + '.json')
+DESTINATION = Path('/lib/modules') / KERNEL / 'updates/dgx-spark-memory-saver/nvidia-uvm.ko'
 SYS_MODULES = Path('/sys/module')
 
 
@@ -51,21 +52,21 @@ def locked():
 def require_unloaded():
     driver.require(driver.output('uname', '-s') == 'Linux' and driver.output('uname', '-m') == 'aarch64',
                    'Manual installation/removal requires Linux aarch64.')
-    if driver.output('uname', '-r') == driver.KERNEL:
+    if driver.output('uname', '-r') == KERNEL:
         driver.require(not (SYS_MODULES / 'nvidia_uvm').exists(),
                        'Stop GPU clients and unload nvidia_uvm before changing its installation.')
 
 
-def validate_artifact(module, allow_unsigned=False):
+def validate_artifact(module, version, allow_unsigned=False):
     receipt = json.loads((module.parent / 'build.json').read_text())
-    driver.require(receipt.get('schema') == 1 and receipt.get('kernel') == driver.KERNEL and
-                   receipt.get('driver') == driver.DRIVER and receipt.get('default_on') is True,
+    driver.require(receipt.get('schema') == 1 and receipt.get('kernel') == KERNEL and
+                   receipt.get('driver') == version and receipt.get('default_on') is True,
                    'A persistent build for the pinned kernel/driver is required.')
     driver.require(receipt.get('module_sha256') == digest(module),
                    'Module changed after build/signing; rebuild instead of editing the receipt.')
-    driver.require(driver.output('modinfo', '-F', 'version', str(module)) == driver.DRIVER,
+    driver.require(driver.output('modinfo', '-F', 'version', str(module)) == version,
                    'Module driver version does not match.')
-    driver.require(driver.output('modinfo', '-F', 'vermagic', str(module)).split()[0] == driver.KERNEL,
+    driver.require(driver.output('modinfo', '-F', 'vermagic', str(module)).split()[0] == KERNEL,
                    'Module kernel vermagic does not match.')
     state = driver.output('mokutil', '--sb-state').splitlines()
     enabled = 'SecureBoot enabled' in state
@@ -92,11 +93,11 @@ def install(module, allow_unsigned=False):
     dkms = driver.output('dkms', 'status')
     driver.require(not any(line.startswith('dgx-spark-memory-saver/') for line in dkms.splitlines()),
                    'Remove the memory-saver DKMS registration before manual installation.')
-    driver.check_install(driver.KERNEL, Path('/lib/modules') / driver.KERNEL / 'build')
-    driver.require((driver.BOOT / ('initrd.img-' + driver.KERNEL)).is_file(),
+    profile = driver.check_install(KERNEL, Path('/lib/modules') / KERNEL / 'build')
+    driver.require((driver.BOOT / ('initrd.img-' + KERNEL)).is_file(),
                    'Target initramfs is missing; complete kernel setup first.')
-    receipt = validate_artifact(module, allow_unsigned)
-    receipt.update(state='installing', method='manual', package_version='0.2.0',
+    receipt = validate_artifact(module, profile['driver'], allow_unsigned)
+    receipt.update(state='installing', method='manual', package_version=driver.PACKAGE_VERSION,
                    destination=str(DESTINATION))
     # Journal first: removal can recover even if copying or initramfs refresh fails.
     save_receipt(receipt)
@@ -114,11 +115,11 @@ def install(module, allow_unsigned=False):
     finally:
         Path(name).unlink(missing_ok=True)
     # No cached module index or initramfs may retain the previous selection.
-    if (driver.BOOT / ('initrd.img-' + driver.KERNEL)).exists():
-        driver.refresh_initramfs(driver.KERNEL)
+    if (driver.BOOT / ('initrd.img-' + KERNEL)).exists():
+        driver.refresh_initramfs(KERNEL)
     else:
-        driver.run('depmod', driver.KERNEL)
-    selected = Path(driver.output('modinfo', '-k', driver.KERNEL, '-F', 'filename', 'nvidia_uvm'))
+        driver.run('depmod', KERNEL)
+    selected = Path(driver.output('modinfo', '-k', KERNEL, '-F', 'filename', 'nvidia_uvm'))
     driver.require(selected.resolve() == DESTINATION.resolve(),
                    'Installed file is not selected. Run remove-manual to restore stock.')
     receipt['state'] = 'installed'
@@ -130,7 +131,7 @@ def remove():
     require_unloaded()
     driver.require(RECEIPT.is_file() and not RECEIPT.is_symlink(), 'No manual installation receipt found.')
     receipt = json.loads(RECEIPT.read_text())
-    driver.require(receipt.get('kernel') == driver.KERNEL and receipt.get('method') == 'manual' and
+    driver.require(receipt.get('kernel') == KERNEL and receipt.get('method') == 'manual' and
                    receipt.get('destination') == str(DESTINATION), 'Invalid manual installation receipt.')
     if DESTINATION.exists() or DESTINATION.is_symlink():
         driver.require(not DESTINATION.is_symlink() and digest(DESTINATION) == receipt.get('module_sha256'),
@@ -138,15 +139,15 @@ def remove():
     receipt['state'] = 'removing'
     save_receipt(receipt)
     DESTINATION.unlink(missing_ok=True)
-    if (driver.BOOT / ('initrd.img-' + driver.KERNEL)).exists():
-        driver.refresh_initramfs(driver.KERNEL)
+    if (driver.BOOT / ('initrd.img-' + KERNEL)).exists():
+        driver.refresh_initramfs(KERNEL)
     else:
-        driver.run('depmod', driver.KERNEL)
-    selected = Path(driver.output('modinfo', '-k', driver.KERNEL, '-F', 'filename', 'nvidia_uvm'))
-    packaged = driver.output('dpkg-query', '-L', driver.MODULE_PACKAGE).splitlines()
-    stock = [Path(p) for p in packaged
-             if p.endswith(('/nvidia-uvm.ko', '/nvidia-uvm.ko.zst', '/nvidia-uvm.ko.xz'))]
-    driver.require(len(stock) == 1 and stock[0].is_file() and selected.resolve() == stock[0].resolve(),
+        driver.run('depmod', KERNEL)
+    selected = Path(driver.output('modinfo', '-k', KERNEL, '-F', 'filename', 'nvidia_uvm'))
+    version = driver.output('modinfo', '-k', KERNEL, '-F', 'version', 'nvidia')
+    stock = driver.stock_module(KERNEL, version)
+    driver.check_module(stock, KERNEL, version)
+    driver.require(selected.resolve() == stock.resolve(),
                    'Stock UVM is not selected. Repair the packaged driver, then rerun remove-manual.')
     driver.require('uvm_pack_sysmem_leaf_tables:' not in driver.output('modinfo', '-p', str(selected)),
                    'Selected module still exposes the packing parameter.')
@@ -155,12 +156,18 @@ def remove():
 
 
 def main(action):
+    global KERNEL, RECEIPT, DESTINATION
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--kernel", default=driver.KERNEL)
     if action == 'install':
         parser.add_argument('--module', type=Path, default=driver.WORK / 'nvidia-uvm.ko')
         parser.add_argument('--unsigned', action='store_true', help='Allow unsigned build only with Secure Boot disabled')
     args = parser.parse_args()
     try:
+        driver.kernel_profile(args.kernel)
+        KERNEL = args.kernel
+        RECEIPT = STATE / ('manual-' + KERNEL + '.json')
+        DESTINATION = Path('/lib/modules') / KERNEL / 'updates/dgx-spark-memory-saver/nvidia-uvm.ko'
         with locked():
             if action == 'install':
                 install(args.module, args.unsigned)

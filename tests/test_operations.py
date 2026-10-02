@@ -18,6 +18,8 @@ import driver_build as driver
 import signing
 import manual_install as manual
 import status_report as status
+VERSION = "580.178.04"
+MODULE_PACKAGE = driver.module_package(driver.KERNEL, VERSION)
 
 
 class SigningTests(unittest.TestCase):
@@ -120,7 +122,7 @@ class ManualTests(unittest.TestCase):
         self.stock = root / 'stock/nvidia-uvm.ko'
         self.stock.parent.mkdir()
         self.stock.write_bytes(b'packaged module')
-        self.metadata = {'schema': 1, 'kernel': driver.KERNEL, 'driver': driver.DRIVER,
+        self.metadata = {'schema': 1, 'kernel': driver.KERNEL, 'driver': VERSION,
                          'default_on': True, 'signed': False,
                          'module_sha256': manual.digest(self.module)}
         self.write_metadata()
@@ -137,6 +139,7 @@ class ManualTests(unittest.TestCase):
             mock = guard.start()
             setattr(self, 'mock_' + name, mock)
             self.addCleanup(guard.stop)
+        self.mock_check_install.return_value = {'driver': VERSION}
 
     def write_metadata(self):
         (self.module.parent / 'build.json').write_text(json.dumps(self.metadata))
@@ -147,9 +150,12 @@ class ManualTests(unittest.TestCase):
         defaults = {('uname', '-s'): 'Linux', ('uname', '-m'): 'aarch64',
                     ('uname', '-r'): driver.KERNEL, ('dkms', 'status'): '',
                     ('mokutil', '--sb-state'): 'SecureBoot disabled',
-                    ('modinfo', '-F', 'version', str(self.module)): driver.DRIVER,
+                    ('modinfo', '-F', 'version', str(self.module)): VERSION,
+                    ('modinfo', '-k', driver.KERNEL, '-F', 'version', 'nvidia'): VERSION,
+                    ('modinfo', '-F', 'version', str(self.stock)): VERSION,
+                    ('modinfo', '-F', 'vermagic', str(self.stock)): driver.KERNEL + ' SMP',
                     ('modinfo', '-F', 'vermagic', str(self.module)): driver.KERNEL + ' SMP',
-                    ('dpkg-query', '-L', driver.MODULE_PACKAGE): str(self.stock),
+                    ('dpkg-query', '-L', MODULE_PACKAGE): str(self.stock),
                     ('modinfo', '-p', str(self.stock)): 'stock_option: description'}
         if args == ('modinfo', '-k', driver.KERNEL, '-F', 'filename', 'nvidia_uvm'):
             return str(self.destination if self.destination.exists() else self.stock)
@@ -222,6 +228,18 @@ class ManualTests(unittest.TestCase):
         self.assertEqual(self.destination.read_bytes(), b'some other module')
         self.assertTrue(self.receipt.exists())
 
+    def test_removal_can_restore_current_driver_after_package_change(self):
+        manual.install(self.module, True)
+        # Recovery must not depend on retaining the original source package or
+        # on a new driver already having a reviewed memory-saver profile.
+        replacement = '999.1.0'
+        self.overrides[('modinfo', '-k', driver.KERNEL, '-F', 'version', 'nvidia')] = replacement
+        self.overrides[('dpkg-query', '-L', driver.module_package(driver.KERNEL, replacement))] = str(self.stock)
+        self.overrides[('modinfo', '-F', 'version', str(self.stock))] = replacement
+        manual.remove()
+        self.assertFalse(self.destination.exists())
+        self.assertFalse(self.receipt.exists())
+
     def test_failed_refresh_is_recoverable_through_remove(self):
         self.mock_refresh_initramfs.side_effect = subprocess.CalledProcessError(1, 'update-initramfs')
         with self.assertRaises(subprocess.CalledProcessError):
@@ -246,11 +264,11 @@ class ManualTests(unittest.TestCase):
 
 class StatusTests(unittest.TestCase):
     def snapshot(self):
-        return {'kernel': driver.KERNEL, 'page_size': '65536', 'rm_version': driver.DRIVER,
+        return {'kernel': driver.KERNEL, 'page_size': '65536', 'rm_version': VERSION,
                 'uvm_loaded': True, 'loaded_srcversion': 'abc', 'packing': 'Y',
-                'current_disk': {'srcversion': 'abc', 'packing_parameter': True, 'version': driver.DRIVER},
-                'target_disk': {'packing_parameter': True, 'version': driver.DRIVER},
-                'target_rm_version': driver.DRIVER, 'dkms': [], 'manual_install': None,
+                'current_disk': {'srcversion': 'abc', 'packing_parameter': True, 'version': VERSION},
+                'target_disk': {'packing_parameter': True, 'version': VERSION},
+                'target_rm_version': VERSION, 'dkms': [], 'manual_install': None,
                 'issues': [], 'unknowns': []}
 
     def test_healthy_parameter_state_without_savings_claim(self):
@@ -258,6 +276,15 @@ class StatusTests(unittest.TestCase):
         status.evaluate(data)
         self.assertEqual(data['state'], 'packing-enabled')
         self.assertNotIn('memory_saved', data)
+
+    def test_second_driver_is_reported_as_conditional(self):
+        data = self.snapshot()
+        data['rm_version'] = data['target_rm_version'] = '610.57.04'
+        data['current_disk']['version'] = data['target_disk']['version'] = '610.57.04'
+        status.evaluate(data)
+        self.assertEqual(data['state'], 'packing-enabled')
+        self.assertEqual(data['qualification'], 'conditional')
+        self.assertIn('RM alignment', data['caveat'])
 
     def test_loaded_disk_mismatch_and_driver_drift(self):
         for field, value in [('loaded_srcversion', 'other'), ('rm_version', 'new-driver'),

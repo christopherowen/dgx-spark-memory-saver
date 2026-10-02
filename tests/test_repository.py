@@ -13,6 +13,19 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class RepositoryChecks(unittest.TestCase):
+    def test_profile_manifests_hashes_and_allocator_equivalence(self):
+        registry = json.loads((ROOT / 'compatibility.json').read_text())
+        changes = []
+        for version, profile in registry['drivers'].items():
+            manifest = json.loads((ROOT / profile['manifest']).read_text())
+            self.assertEqual(manifest['upstream']['tag'], version)
+            self.assertTrue(set(profile['kernels']) <= set(registry['kernels']))
+            patch = (ROOT / profile['patch']).read_bytes()
+            self.assertEqual(hashlib.sha256(patch).hexdigest(), profile['patch_sha256'])
+            changes.append([line for line in patch.decode().splitlines()
+                            if line.startswith(('+', '-')) and not line.startswith(('+++', '---'))])
+        self.assertTrue(all(change == changes[0] for change in changes))
+
     def test_historical_artifact_hashes(self):
         manifest = json.loads((ROOT / 'provenance.json').read_text())
         for name, record in manifest['copied_files'].items():
