@@ -1,7 +1,10 @@
 # DGX Spark Memory Saver
 
 **R610 qualification branch:** package 0.3.0 targets NVIDIA 610.57.04.
-Hardware validation is pending. The performance and installation evidence below
+This port passed bounded GPU and serving checks with a separately corrected RM
+driver and system memory pools disabled. Stock R610 failed the large-copy check
+on 64 KiB Linux, including with stock UVM; this branch alone does not fix it.
+The performance and installation evidence below
 belongs to the released 580.178.04 / 0.2.0 implementation. Use
 [the R610 port notes](docs/driver-610.md) for this branch; the other installation
 guides describe the released R580 package.
