@@ -1,0 +1,67 @@
+{
+  "status": "quality, memory recovery and matched-client comparison complete; stock 4k rollback verified; not promoted",
+  "deployment_commit": "1a257414c1ceb66d4a533b650530d4a3e0393583",
+  "source_package": "nvidia-kernel-source-580-open=580.178.04-0ubuntu0.24.04.1",
+  "kernel": "7.0.0-1019-nvidia-64k",
+  "module_sha256_unsigned": "abea9224cfedfec5b04560ebc1d11a8a4caef5d393137211b182c387fab6d540",
+  "module_sha256_signed": "07480bd04acc4ab6db7a07f7a251ed59bbdd4b3540bd6f766d66e21ac8681a95",
+  "loaded_srcversion": "2A94659FBB6D360FF27D9A9",
+  "signer": "DGX Fleet Secure Boot Module Signature key",
+  "parameters": {
+    "uvm_pack_sysmem_leaf_tables": "Y",
+    "uvm_release_asserts": 1,
+    "uvm_release_asserts_set_global_error": 1
+  },
+  "tests": {
+    "stock-allocation-stress": {
+      "passed": true,
+      "allocations": 3584,
+      "threads": 4,
+      "rounds": 12,
+      "full_buffer_readback": true,
+      "seconds": 2.5084862450000003
+    },
+    "pool-allocation-stress": {
+      "passed": true,
+      "allocations": 3584,
+      "threads": 4,
+      "rounds": 12,
+      "full_buffer_readback": true,
+      "seconds": 2.932358354999991
+    },
+    "pool-large-copy-graph": {
+      "passed": true,
+      "large_copy_bytes": 4831838208,
+      "seconds": 1.4285081080000168,
+      "device": "NVIDIA GB10",
+      "torch": "2.13.0+cu130"
+    }
+  },
+  "uvm_backing": {
+    "4k-stock": {
+      "bytes": 218243072,
+      "source_sha256": "6aaaceabe101c5f1df4416d3385c721c49bad87be18cd2bce4cba2ef989fa99b"
+    },
+    "64k-stock": {
+      "bytes": 3491823616,
+      "source_sha256": "e8115990199089648923bf8e8e7849e98a54d50105c3bd58772b9160e10ebc6f"
+    },
+    "64k-pool": {
+      "bytes": 233766912,
+      "source_sha256": "546e12bef45dbbe28397266e3283a97485a82bdc72dda3fa26b1feeb4f826b79"
+    }
+  },
+  "uvm_recovered_gib": 3.0343017578125,
+  "comparison": {
+    "control": "bench-4k-repeat.json",
+    "candidate": "bench-64k-pool.json",
+    "same_workload_and_client": true,
+    "prefill_token_counts_match": true,
+    "usable_memory_gain_gib": {
+      "dgx1": 1.86,
+      "dgx2": 1.79,
+      "dgx3": 1.78
+    },
+    "conclusion": "Recovers 3.03 GiB of driver backing versus stock 64k and 1.78\u20131.86 GiB of usable memory versus 4k. No substantial TPS or TTFT gain demonstrated."
+  }
+}

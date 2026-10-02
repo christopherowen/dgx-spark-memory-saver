@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "upstream": {
+    "repository": "https://github.com/NVIDIA/open-gpu-kernel-modules",
+    "tag": "580.178.04",
+    "package": "nvidia-kernel-source-580-open",
+    "package_version": "580.178.04-0ubuntu0.24.04.1",
+    "source_root": "/usr/src/nvidia-580.178.04",
+    "file_sha256": {
+      "nvidia-uvm/uvm_mmu.c": "61dcbb1826e6104452d82d319b5b8c810e328e6a606f619e0efaa273d162bdea",
+      "nvidia-uvm/uvm_mmu.h": "9676e8dd2e3ce37390fdac6a8dd18d728d23e81ce4f47f7978971928ec9ba419"
+    }
+  },
+  "tested_kernel": "7.0.0-1019-nvidia-64k",
+  "origin": {
+    "repository": "https://github.com/christopherowen/spark3-vllm-ds41f",
+    "commit": "0e3b624e55e350ca621b336f8b88626f60dec9da",
+    "experiment": "experiments/2026-10-02-kernel-64k"
+  },
+  "copied_files": {
+    "patches/0001-pack-user-leaf-tables.patch": {
+      "original_path": "experiments/2026-10-02-kernel-64k/uvm-pool/0001-pack-user-leaf-tables.patch",
+      "sha256": "33d9906c91be277de4ad74632b0dd5b87dab24e62256dcf382008e2551740319"
+    },
+    "tests/allocation_stress.py": {
+      "original_path": "experiments/2026-10-02-kernel-64k/uvm-pool/allocation_stress.py",
+      "sha256": "e8f2191e2ac0fa95967b82c24f342e2a0d54c82dd835fb478ddad4b7056d8673"
+    },
+    "tests/cuda_smoke.py": {
+      "original_path": "experiments/2026-10-02-kernel-64k/boot-test/cuda_smoke.py",
+      "sha256": "0b665706c6eae904f528e2e9fc0a7c4a0b71170e326d1ff0368640833cb07f16"
+    },
+    "tools/kernel-charges.bt": {
+      "original_path": "experiments/2026-10-02-kernel-64k/memory-profile/kernel-charges.bt",
+      "sha256": "7cbc257374451c44312405db57874e43fd97918d60e33813d4500eac1a249584"
+    },
+    "results/2026-10-02/bench-4k-repeat.json": {
+      "original_path": "experiments/2026-10-02-kernel-64k/uvm-pool/bench-4k-repeat.json",
+      "sha256": "486d70c58546ca5fc85287ec98f8866177ffd3a1e4029a41a142eb7ad59a6de3"
+    },
+    "results/2026-10-02/bench-64k-pool.json": {
+      "original_path": "experiments/2026-10-02-kernel-64k/uvm-pool/bench-64k-pool.json",
+      "sha256": "3d4ba1c4bcb7d36a0f0c14c0bb0fe77e100e57cfc8993e3037551f65effcd6ef"
+    },
+    "results/2026-10-02/trial-results.json": {
+      "original_path": "experiments/2026-10-02-kernel-64k/uvm-pool/trial-results.json",
+      "sha256": "0332a6422c60d85f2696333e19d102986b43928a3babde5f934e0d1b5bf65d86"
+    }
+  }
+}

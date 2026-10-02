@@ -1,0 +1,5 @@
+The patch includes context from NVIDIA open-gpu-kernel-modules 580.178.04,
+Copyright (c) 2015-2025 NVIDIA Corporation, under the MIT notice reproduced
+in LICENSES/NVIDIA-MIT.txt. The upstream driver retains its own licensing;
+this repository does not relicense the driver or distribute its binaries.
+Original additions and supporting scripts are under LICENSE.

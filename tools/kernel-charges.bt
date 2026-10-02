@@ -1,0 +1,53 @@
+// Linux 7.0 memcontrol.h: charge_page(page,gfp,order) returns 0 on success.
+// Track charged kernel pages, not user anonymous or file-cache memory.
+// Start before model startup. $1 = actual PAGE_SIZE.
+BEGIN {
+    // bpftrace 0.20 needs this map's type before the replacement accounting.
+    @bytes[0] = (uint64)0;
+    delete(@bytes[0]);
+    printf("READY page_size=%d\n", $1);
+}
+kprobe:__memcg_kmem_charge_page {
+    @pending_page[tid] = arg0;
+    @pending_bytes[tid] = ((uint64)1 << arg2) * $1;
+    @pending_stack[tid] = kstack(20);
+    @pending_comm[tid] = comm;
+}
+kretprobe:__memcg_kmem_charge_page /@pending_page[tid]/ {
+    $p = @pending_page[tid];
+    if (retval == 0 && (((struct page *)$p)->memcg_data & 2)) {
+        if (@bytes[$p]) {
+            // Keep the latest ownership record without double counting a page.
+            // Retain the replaced attribution so incomplete uncharge coverage
+            // remains visible in the result rather than silently disappearing.
+            @duplicate_charge = count();
+            @replaced_bytes[@stack[$p], @name[$p]] = sum(@bytes[$p]);
+            @live_bytes[@stack[$p], @name[$p]] = sum(-((int64)@bytes[$p]));
+            @live_count[@stack[$p], @name[$p]] = sum(-1);
+            @outstanding_bytes = sum(-((int64)@bytes[$p]));
+        }
+        @bytes[$p] = @pending_bytes[tid];
+        @stack[$p] = @pending_stack[tid];
+        @name[$p] = @pending_comm[tid];
+        @live_bytes[@stack[$p], @name[$p]] = sum((int64)@bytes[$p]);
+        @live_count[@stack[$p], @name[$p]] = sum(1);
+        @outstanding_bytes = sum((int64)@bytes[$p]);
+        @total_charged_bytes = sum(@bytes[$p]);
+    } else if (retval != 0) { @charge_failures = count(); }
+    delete(@pending_page[tid]); delete(@pending_bytes[tid]);
+    delete(@pending_stack[tid]); delete(@pending_comm[tid]);
+}
+kprobe:__memcg_kmem_uncharge_page /@bytes[arg0]/ {
+    $p = arg0;
+    if (@bytes[$p] != (((uint64)1 << arg1) * $1)) { @order_mismatch = count(); }
+    @live_bytes[@stack[$p], @name[$p]] = sum(-((int64)@bytes[$p]));
+    @live_count[@stack[$p], @name[$p]] = sum(-1);
+    @outstanding_bytes = sum(-((int64)@bytes[$p]));
+    delete(@bytes[$p]); delete(@stack[$p]); delete(@name[$p]);
+}
+kprobe:phys_mem_allocate { @uvm_requested_sizes[arg1] = count(); }
+interval:s:1 { printf("LIVE t=%llu\n", elapsed / 1000000000); print(@outstanding_bytes); }
+END {
+    clear(@pending_page); clear(@pending_bytes); clear(@pending_stack); clear(@pending_comm);
+    clear(@bytes); clear(@stack); clear(@name);
+}

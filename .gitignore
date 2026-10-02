@@ -1,0 +1,8 @@
+.work/
+__pycache__/
+*.py[cod]
+*.ko
+*.priv
+*.key
+.env*
+.DS_Store
