@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "host": "dgx1",
+  "commit": "784587863ca06932d32de0378b5d499c4201654a",
+  "dkms_version": "dkms-3.4.3",
+  "kernel": "7.0.0-1019-nvidia-64k",
+  "module": {
+    "version": "580.178.04",
+    "srcversion": "34683B82C2D3339BBD2EEC9",
+    "vermagic": "7.0.0-1019-nvidia-64k SMP preempt mod_unload modversions aarch64",
+    "signer": "DGX Spark local module signing",
+    "sig_hashalgo": "sha512"
+  },
+  "module_sha256": "6baf59c8317cb53c0915ea5e291587dd1d4adc30587edbd3f2cf87da168ef402",
+  "installed_dkms_script_sha256": "a7a45df4e9f8a4fbea258a54b31d21760121560fe0b6187e34d5b39944e2767b",
+  "isolated_dkms_script_sha256": "8ad0ac3964bc5e4966f5c0313768dae49a70c098179eb88cbdc3918441cede43",
+  "isolation": "Unprivileged private source/state/install trees; DKMS /etc/dkms references redirected to private configuration; disposable key never enrolled.",
+  "result": "add/build/sign passed; no installation, load or reboot",
+  "limits": {
+    "cpu_quota_percent": 100,
+    "memory_max_bytes": 2147483648,
+    "memory_swap_max_bytes": 0,
+    "nice": 19,
+    "runtime_max_seconds": 600
+  },
+  "runtime_seconds": 123.2,
+  "cpu_seconds": 122.922,
+  "memory_peak_reported": "938.6M",
+  "memory_swap_peak_bytes": 0,
+  "live_status": {
+    "kernel": "7.0.0-1019-nvidia",
+    "page_size": "4096",
+    "rm_version": "580.178.04",
+    "uvm_loaded": true,
+    "loaded_srcversion": "09F2A78862D06017E9324B6",
+    "packing": null,
+    "current_disk": {
+      "filename": "/lib/modules/7.0.0-1019-nvidia/kernel/nvidia-580-open/nvidia-uvm.ko",
+      "version": "580.178.04",
+      "srcversion": "09F2A78862D06017E9324B6",
+      "signer": "Canonical Ltd. Kernel Module Signing",
+      "packing_parameter": false
+    },
+    "target_disk": {
+      "filename": "/lib/modules/7.0.0-1019-nvidia-64k/kernel/nvidia-580-open/nvidia-uvm.ko",
+      "version": "580.178.04",
+      "srcversion": "09F2A78862D06017E9324B6",
+      "signer": "Canonical Ltd. Kernel Module Signing",
+      "packing_parameter": false
+    },
+    "target_rm_version": "580.178.04",
+    "secure_boot": "SecureBoot enabled",
+    "manual_install": null,
+    "dkms": [],
+    "issues": [],
+    "unknowns": [],
+    "state": "stock-loaded"
+  }
+}

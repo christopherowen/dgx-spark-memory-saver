@@ -1,0 +1,470 @@
+DKMS (dkms-3.4.3) make.log for dgx-spark-memory-saver/0.2.0 for kernel 7.0.0-1019-nvidia-64k (aarch64)
+Fri Oct  2 11:46:30 AM CEST 2026
+
+Building module(s)
+# command: ./scripts/driver-build build-dkms --kernel '7.0.0-1019-nvidia-64k' --headers '/lib/modules/7.0.0-1019-nvidia-64k/build'
+patching file nvidia-uvm/uvm_mmu.h
+patching file nvidia-uvm/uvm_mmu.c
+patching file nvidia-uvm/uvm_mmu.c
+make: Entering directory '/tmp/memory-saver-dkms.84UI7t/dkms/dgx-spark-memory-saver/0.2.0/build/.work/nvidia-580.178.04-uvm-pool'
+make[1]: Entering directory '/usr/src/linux-headers-7.0.0-1019-nvidia-64k'
+make[2]: Entering directory '/tmp/memory-saver-dkms.84UI7t/dkms/dgx-spark-memory-saver/0.2.0/build/.work/nvidia-580.178.04-uvm-pool'
+warning: the compiler differs from the one used to build the kernel
+  The kernel was built by: aarch64-linux-gnu-gcc-13 (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+  You are using:           gcc-13 (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+  SYMLINK nvidia/nv-kernel.o
+ CONFTEST: set_pages_uc
+ CONFTEST: list_is_first
+ CONFTEST: set_memory_uc
+ CONFTEST: set_memory_array_uc
+ CONFTEST: set_pages_array_uc
+ CONFTEST: ioremap_cache
+ CONFTEST: ioremap_wc
+ CONFTEST: ioremap_driver_hardened
+ CONFTEST: ioremap_driver_hardened_wc
+ CONFTEST: ioremap_cache_shared
+ CONFTEST: pde_data
+ CONFTEST: xen_ioemu_inject_msi
+ CONFTEST: phys_to_dma
+ CONFTEST: pci_rebar_get_possible_sizes
+ CONFTEST: get_backlight_device_by_name
+ CONFTEST: dma_direct_map_resource
+ CONFTEST: flush_cache_all
+ CONFTEST: vmf_insert_pfn
+ CONFTEST: jiffies_to_timespec
+ CONFTEST: ktime_get_raw_ts64
+ CONFTEST: pci_enable_atomic_ops_to_root
+ CONFTEST: vga_tryget
+ CONFTEST: cc_platform_has
+ CONFTEST: cc_attr_guest_sev_snp
+ CONFTEST: hv_get_isolation_type
+ CONFTEST: seq_read_iter
+ CONFTEST: follow_pfn
+ CONFTEST: ptep_get
+ CONFTEST: drm_gem_object_put_unlocked
+ CONFTEST: add_memory_driver_managed
+ CONFTEST: of_dma_configure
+ CONFTEST: i2c_new_client_device
+ CONFTEST: icc_get
+ CONFTEST: devm_of_icc_get
+ CONFTEST: icc_put
+ CONFTEST: icc_set_bw
+ CONFTEST: dma_map_ops_has_map_phys
+ CONFTEST: dma_buf_ops_has_map
+ CONFTEST: dma_buf_ops_has_map_atomic
+ CONFTEST: dma_buf_attachment_has_peer2peer
+ CONFTEST: devm_clk_bulk_get_all
+ CONFTEST: get_task_ioprio
+ CONFTEST: mdev_set_iommu_device
+ CONFTEST: offline_and_remove_memory
+ CONFTEST: stack_trace
+ CONFTEST: crypto_tfm_ctx_aligned
+ CONFTEST: assign_str
+ CONFTEST: ioasid_get
+ CONFTEST: mm_pasid_drop
+ CONFTEST: iommu_sva_bind_device_has_drvdata_arg
+ CONFTEST: vma_flags_set_word
+ CONFTEST: vm_flags_set
+ CONFTEST: get_dev_pagemap_has_pgmap_arg
+ CONFTEST: iommu_is_dma_domain
+ CONFTEST: for_each_sgtable_dma_page
+ CONFTEST: folio_test_swapcache
+ CONFTEST: page_pgmap
+ CONFTEST: is_export_symbol_gpl_sme_active
+ CONFTEST: is_export_symbol_present_swiotlb_map_sg_attrs
+ CONFTEST: is_export_symbol_present_swiotlb_dma_ops
+ CONFTEST: is_export_symbol_present___close_fd
+ CONFTEST: is_export_symbol_present_close_fd
+ CONFTEST: is_export_symbol_present_pxm_to_node
+ CONFTEST: is_export_symbol_present_screen_info
+ CONFTEST: is_export_symbol_gpl_screen_info
+ CONFTEST: is_export_symbol_present_i2c_bus_status
+ CONFTEST: is_export_symbol_present_tegra_fuse_control_read
+ CONFTEST: is_export_symbol_present_pci_find_host_bridge
+ CONFTEST: is_export_symbol_present_tsec_comms_send_cmd
+ CONFTEST: is_export_symbol_present_tsec_comms_set_init_cb
+ CONFTEST: is_export_symbol_present_tsec_comms_clear_init_cb
+ CONFTEST: is_export_symbol_present_tsec_comms_alloc_mem_from_gscco
+ CONFTEST: is_export_symbol_present_tsec_comms_free_gscco_mem
+ CONFTEST: is_export_symbol_present_memory_block_size_bytes
+ CONFTEST: crypto
+ CONFTEST: crypto_akcipher_verify
+ CONFTEST: is_export_symbol_present_follow_pte
+ CONFTEST: follow_pte_arg_vma
+ CONFTEST: dma_buf_ops_attach_has_arg_dev
+ CONFTEST: is_export_symbol_present_follow_pfnmap_start
+ CONFTEST: is_export_symbol_gpl_pci_ats_supported
+ CONFTEST: ecc_digits_from_bytes
+ CONFTEST: is_export_symbol_gpl_set_memory_encrypted
+ CONFTEST: is_export_symbol_gpl_set_memory_decrypted
+ CONFTEST: is_export_symbol_gpl___platform_driver_register
+ CONFTEST: is_export_symbol_present___platform_driver_register
+ CONFTEST: is_export_symbol_present_hrtimer_setup
+ CONFTEST: is_export_symbol_gpl_mutex_destroy
+ CONFTEST: is_export_symbol_present_timer_delete_sync
+ CONFTEST: is_export_symbol_gpl___vma_start_write
+ CONFTEST: is_export_symbol_gpl_iommu_dev_enable_feature
+ CONFTEST: is_export_symbol_gpl_iommu_dev_disable_feature
+ CONFTEST: is_export_symbol_present_int_active_memcg
+ CONFTEST: is_export_symbol_present_migrate_vma_setup
+ CONFTEST: is_export_symbol_present___iowrite64_lo_hi
+ CONFTEST: is_export_symbol_present_make_device_exclusive
+ CONFTEST: vmf_insert_pfn_prot
+ CONFTEST: sysfs_slab_unlink
+ CONFTEST: proc_ops
+ CONFTEST: vmalloc_has_pgprot_t_arg
+ CONFTEST: mm_has_mmap_lock
+ CONFTEST: pci_channel_state
+ CONFTEST: remove_memory_has_nid_arg
+ CONFTEST: add_memory_driver_managed_has_mhp_flags_arg
+ CONFTEST: num_registered_fb
+ CONFTEST: pci_driver_has_driver_managed_dma
+ CONFTEST: memory_failure_queue_has_trapno_arg
+ CONFTEST: foll_longterm_present
+ CONFTEST: bus_type_has_iommu_ops
+ CONFTEST: of_property_for_each_u32_has_internal_args
+ CONFTEST: platform_driver_struct_remove_returns_void
+ CONFTEST: class_create_has_no_owner_arg
+ CONFTEST: class_devnode_has_const_arg
+ CONFTEST: devfreq_has_freq_table
+ CONFTEST: has_enum_pidtype_tgid
+ CONFTEST: pci_resize_resource_has_exclude_bars_arg
+ CONFTEST: is_vma_write_locked_has_mm_lock_seq_arg
+ CONFTEST: mmu_notifier_ops_arch_invalidate_secondary_tlbs
+ CONFTEST: migrate_vma_added_flags
+ CONFTEST: migrate_device_range
+ CONFTEST: handle_mm_fault_has_pt_regs_arg
+ CONFTEST: dev_pagemap_ops_has_folio_free
+ CONFTEST: zone_device_page_init_has_pgmap_and_order_args
+ CONFTEST: mempolicy_has_unified_nodes
+ CONFTEST: mempolicy_has_home_node
+ CONFTEST: mpol_preferred_many_present
+ CONFTEST: mmu_interval_notifier
+ CONFTEST: sg_dma_page_iter
+ CONFTEST: struct_page_has_zone_device_data
+ CONFTEST: memory_device_coherent_present
+ CONFTEST: dom0_kernel_present
+ CONFTEST: nvidia_vgpu_kvm_build
+ CONFTEST: nvidia_grid_build
+ CONFTEST: nvidia_grid_csp_build
+ CONFTEST: get_user_pages
+ CONFTEST: get_user_pages_remote
+ CONFTEST: pin_user_pages
+ CONFTEST: pin_user_pages_remote
+ CONFTEST: pm_runtime_available
+ CONFTEST: vm_fault_t
+ CONFTEST: pci_class_multimedia_hd_audio
+ CONFTEST: drm_available
+ CONFTEST: vfio_pci_core_available
+ CONFTEST: cmd_uphy_display_port_init
+ CONFTEST: cmd_uphy_display_port_off
+ CONFTEST: memory_failure_mf_sw_simulated_defined
+ CONFTEST: device_vm_build
+ CONFTEST: pcie_reset_flr
+ CONFTEST: module_import_ns_takes_constant
+  CC [M]  nvidia/nv-platform.o
+  CC [M]  nvidia/nv-dsi-parse-panel-props.o
+  CC [M]  nvidia/nv-bpmp.o
+  CC [M]  nvidia/nv-gpio.o
+  CC [M]  nvidia/nv-backlight.o
+  CC [M]  nvidia/nv-imp.o
+  CC [M]  nvidia/nv-platform-pm.o
+  CC [M]  nvidia/nv-ipc-soc.o
+nvidia/nv-imp.c: In function ‘nv_imp_get_import_data’:
+nvidia/nv-imp.c:77:5: warning: this use of "defined" may not be portable [-Wexpansion-to-defined]
+   77 | #if IMP_SUPPORT_FUNCTIONS_PRESENT
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+nvidia/nv-imp.c:77:1: warning: this use of "defined" may not be portable [-Wexpansion-to-defined]
+   77 | #if IMP_SUPPORT_FUNCTIONS_PRESENT
+      | ^~~~~~~~~~~~~~~~~~~
+nvidia/nv-imp.c: In function ‘nv_imp_enable_disable_rfl’:
+nvidia/nv-imp.c:115:5: warning: this use of "defined" may not be portable [-Wexpansion-to-defined]
+  115 | #if IMP_SUPPORT_FUNCTIONS_PRESENT
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+nvidia/nv-imp.c:115:1: warning: this use of "defined" may not be portable [-Wexpansion-to-defined]
+  115 | #if IMP_SUPPORT_FUNCTIONS_PRESENT
+      | ^~~~~~~~~~~~~~~~~~~
+nvidia/nv-imp.c: In function ‘nv_imp_icc_get’:
+nvidia/nv-imp.c:174:5: warning: this use of "defined" may not be portable [-Wexpansion-to-defined]
+  174 | #if ICC_SUPPORT_FUNCTIONS_PRESENT && NV_SUPPORTS_PLATFORM_DEVICE
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+nvidia/nv-imp.c: In function ‘nv_imp_icc_put’:
+nvidia/nv-imp.c:249:5: warning: this use of "defined" may not be portable [-Wexpansion-to-defined]
+  249 | #if ICC_SUPPORT_FUNCTIONS_PRESENT
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+nvidia/nv-imp.c: In function ‘nv_imp_icc_set_bw’:
+nvidia/nv-imp.c:308:5: warning: this use of "defined" may not be portable [-Wexpansion-to-defined]
+  308 | #if ICC_SUPPORT_FUNCTIONS_PRESENT && NV_SUPPORTS_PLATFORM_DEVICE
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  CC [M]  nvidia/nv.o
+  CC [M]  nvidia/nv-pci.o
+  CC [M]  nvidia/nv-dmabuf.o
+  CC [M]  nvidia/nv-nano-timer.o
+  CC [M]  nvidia/nv-acpi.o
+  CC [M]  nvidia/nv-cray.o
+  CC [M]  nvidia/nv-dma.o
+  CC [M]  nvidia/nv-i2c.o
+  CC [M]  nvidia/nv-mmap.o
+  CC [M]  nvidia/nv-p2p.o
+  CC [M]  nvidia/nv-pat.o
+  CC [M]  nvidia/nv-procfs.o
+  CC [M]  nvidia/nv-usermap.o
+  CC [M]  nvidia/nv-vm.o
+  CC [M]  nvidia/nv-vtophys.o
+  CC [M]  nvidia/os-interface.o
+  CC [M]  nvidia/os-mlock.o
+  CC [M]  nvidia/os-pci.o
+  CC [M]  nvidia/os-registry.o
+nvidia/os-interface.c: In function ‘os_dbg_breakpoint’:
+nvidia/os-interface.c:1251:7: warning: #warning "Need to implement os_dbg_breakpoint() for aarch64" [-Wcpp]
+ 1251 |     # warning "Need to implement os_dbg_breakpoint() for aarch64"
+      |       ^~~~~~~
+  CC [M]  nvidia/os-usermap.o
+  CC [M]  nvidia/nv-modeset-interface.o
+  CC [M]  nvidia/nv-pci-table.o
+  CC [M]  nvidia/nv-kthread-q.o
+  CC [M]  nvidia/nv-memdbg.o
+  CC [M]  nvidia/nv-report-err.o
+  CC [M]  nvidia/nv-rsync.o
+  CC [M]  nvidia/nv-msi.o
+  CC [M]  nvidia/nv-caps.o
+  CC [M]  nvidia/nv-caps-imex.o
+  CC [M]  nvidia/nv-clk.o
+  CC [M]  nvidia/nv-host1x.o
+  CC [M]  nvidia/nv_uvm_interface.o
+  CC [M]  nvidia/libspdm_aead.o
+  CC [M]  nvidia/libspdm_ecc.o
+  CC [M]  nvidia/libspdm_hkdf.o
+  CC [M]  nvidia/libspdm_rand.o
+  CC [M]  nvidia/libspdm_shash.o
+  CC [M]  nvidia/libspdm_rsa.o
+  CC [M]  nvidia/libspdm_aead_aes_gcm.o
+nvidia/libspdm_rand.c:34:6: warning: no previous prototype for ‘libspdm_random_seed’ [-Wmissing-prototypes]
+   34 | bool libspdm_random_seed(const uint8_t *seed, size_t seed_size)
+      |      ^~~~~~~~~~~~~~~~~~~
+  CC [M]  nvidia/libspdm_sha.o
+  CC [M]  nvidia/libspdm_hmac_sha.o
+  CC [M]  nvidia/libspdm_internal_crypt_lib.o
+  CC [M]  nvidia/libspdm_hkdf_sha.o
+  CC [M]  nvidia/libspdm_ec.o
+nvidia/libspdm_internal_crypt_lib.c:31:6: warning: no previous prototype for ‘libspdm_check_crypto_backend’ [-Wmissing-prototypes]
+   31 | bool libspdm_check_crypto_backend(void)
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  CC [M]  nvidia/libspdm_x509.o
+  CC [M]  nvidia/libspdm_rsa_ext.o
+nvidia/libspdm_hkdf_sha.c:29:6: warning: no previous prototype for ‘libspdm_hkdf_sha256_extract_and_expand’ [-Wmissing-prototypes]
+   29 | bool libspdm_hkdf_sha256_extract_and_expand(const uint8_t *key, size_t key_size,
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+nvidia/libspdm_hkdf_sha.c:57:6: warning: no previous prototype for ‘libspdm_hkdf_sha384_extract_and_expand’ [-Wmissing-prototypes]
+   57 | bool libspdm_hkdf_sha384_extract_and_expand(const uint8_t *key, size_t key_size,
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+nvidia/libspdm_hkdf_sha.c:85:6: warning: no previous prototype for ‘libspdm_hkdf_sha512_extract_and_expand’ [-Wmissing-prototypes]
+   85 | bool libspdm_hkdf_sha512_extract_and_expand(const uint8_t *key, size_t key_size,
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  CC [M]  nvidia/nvlink_linux.o
+nvidia/libspdm_ec.c:36:6: warning: no previous prototype for ‘libspdm_ec_set_pub_key’ [-Wmissing-prototypes]
+   36 | bool libspdm_ec_set_pub_key(void *ec_context, const uint8_t *public_key,
+      |      ^~~~~~~~~~~~~~~~~~~~~~
+nvidia/libspdm_ec.c:46:6: warning: no previous prototype for ‘libspdm_ec_get_pub_key’ [-Wmissing-prototypes]
+   46 | bool libspdm_ec_get_pub_key(void *ec_context, uint8_t *public_key,
+      |      ^~~~~~~~~~~~~~~~~~~~~~
+nvidia/libspdm_ec.c:60:6: warning: no previous prototype for ‘libspdm_ec_check_key’ [-Wmissing-prototypes]
+   60 | bool libspdm_ec_check_key(const void *ec_context)
+      |      ^~~~~~~~~~~~~~~~~~~~
+  CC [M]  nvidia/nvlink_caps.o
+nvidia/libspdm_x509.c:35:6: warning: no previous prototype for ‘libspdm_x509_construct_certificate’ [-Wmissing-prototypes]
+   35 | bool libspdm_x509_construct_certificate(const uint8_t *cert, size_t cert_size,
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+nvidia/libspdm_x509.c:42:6: warning: no previous prototype for ‘libspdm_x509_construct_certificate_stack’ [-Wmissing-prototypes]
+   42 | bool libspdm_x509_construct_certificate_stack(uint8_t **x509_stack, ...)
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+nvidia/libspdm_x509.c:48:6: warning: no previous prototype for ‘libspdm_x509_free’ [-Wmissing-prototypes]
+   48 | void libspdm_x509_free(void *x509_cert)
+      |      ^~~~~~~~~~~~~~~~~
+nvidia/libspdm_x509.c:53:6: warning: no previous prototype for ‘libspdm_x509_stack_free’ [-Wmissing-prototypes]
+   53 | void libspdm_x509_stack_free(void *x509_stack)
+      |      ^~~~~~~~~~~~~~~~~~~~~~~
+nvidia/libspdm_x509.c:59:6: warning: no previous prototype for ‘libspdm_encode_base64’ [-Wmissing-prototypes]
+   59 | bool libspdm_encode_base64(const uint8_t *src, uint8_t *dst, size_t srclen, size_t *p_dstlen)
+      |      ^~~~~~~~~~~~~~~~~~~~~
+nvidia/libspdm_x509.c: In function ‘libspdm_encode_base64’:
+nvidia/libspdm_x509.c:64:12: warning: unused variable ‘size’ [-Wunused-variable]
+   64 |     size_t size;
+      |            ^~~~
+nvidia/libspdm_x509.c: At top level:
+nvidia/libspdm_x509.c:224:6: warning: no previous prototype for ‘libspdm_decode_base64’ [-Wmissing-prototypes]
+  224 | bool libspdm_decode_base64(const uint8_t *src, uint8_t *dst, size_t srclen, size_t *p_dstlen)
+      |      ^~~~~~~~~~~~~~~~~~~~~
+nvidia/libspdm_x509.c:337:6: warning: no previous prototype for ‘libspdm_x509_get_common_name’ [-Wmissing-prototypes]
+  337 | bool libspdm_x509_get_common_name(const uint8_t *cert, size_t cert_size,
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+nvidia/libspdm_x509.c:346:1: warning: no previous prototype for ‘libspdm_x509_get_organization_name’ [-Wmissing-prototypes]
+  346 | libspdm_x509_get_organization_name(const uint8_t *cert, size_t cert_size,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+nvidia/libspdm_x509.c:566:6: warning: no previous prototype for ‘libspdm_x509_get_tbs_cert’ [-Wmissing-prototypes]
+  566 | bool libspdm_x509_get_tbs_cert(const uint8_t *cert, size_t cert_size,
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~
+nvidia/libspdm_x509.c:597:1: warning: no previous prototype for ‘libspdm_x509_get_issuer_common_name’ [-Wmissing-prototypes]
+  597 | libspdm_x509_get_issuer_common_name(const uint8_t *cert, size_t cert_size,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+nvidia/libspdm_x509.c:606:1: warning: no previous prototype for ‘libspdm_x509_get_issuer_orgnization_name’ [-Wmissing-prototypes]
+  606 | libspdm_x509_get_issuer_orgnization_name(const uint8_t *cert, size_t cert_size,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+nvidia/libspdm_x509.c:614:6: warning: no previous prototype for ‘libspdm_x509_get_signature_algorithm’ [-Wmissing-prototypes]
+  614 | bool libspdm_x509_get_signature_algorithm(const uint8_t *cert,
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+nvidia/libspdm_x509.c:675:6: warning: no previous prototype for ‘libspdm_gen_x509_csr’ [-Wmissing-prototypes]
+  675 | bool libspdm_gen_x509_csr(size_t hash_nid, size_t asym_nid,
+      |      ^~~~~~~~~~~~~~~~~~~~
+  CC [M]  nvidia/linux_nvswitch.o
+  CC [M]  nvidia/procfs_nvswitch.o
+  CC [M]  nvidia/i2c_nvswitch.o
+  CC [M]  nvidia-uvm/uvm_common.o
+  CC [M]  nvidia-uvm/uvm_linux.o
+  CC [M]  nvidia-uvm/nvstatus.o
+  CC [M]  nvidia-uvm/nvCpuUuid.o
+  CC [M]  nvidia-uvm/nv-kthread-q.o
+  CC [M]  nvidia-uvm/nv-kthread-q-selftest.o
+  CC [M]  nvidia-uvm/uvm.o
+  CC [M]  nvidia-uvm/uvm_tools.o
+  CC [M]  nvidia-uvm/uvm_global.o
+  CC [M]  nvidia-uvm/uvm_gpu.o
+  CC [M]  nvidia-uvm/uvm_gpu_isr.o
+  CC [M]  nvidia-uvm/uvm_procfs.o
+  CC [M]  nvidia-uvm/uvm_va_space.o
+  CC [M]  nvidia-uvm/uvm_va_space_mm.o
+  CC [M]  nvidia-uvm/uvm_gpu_semaphore.o
+  CC [M]  nvidia-uvm/uvm_mem.o
+  CC [M]  nvidia-uvm/uvm_rm_mem.o
+  CC [M]  nvidia-uvm/uvm_channel.o
+  CC [M]  nvidia-uvm/uvm_lock.o
+  CC [M]  nvidia-uvm/uvm_hal.o
+  CC [M]  nvidia-uvm/uvm_fd_type.o
+  CC [M]  nvidia-uvm/uvm_processors.o
+  CC [M]  nvidia-uvm/uvm_range_tree.o
+  CC [M]  nvidia-uvm/uvm_rb_tree.o
+  CC [M]  nvidia-uvm/uvm_range_allocator.o
+  CC [M]  nvidia-uvm/uvm_va_range.o
+  CC [M]  nvidia-uvm/uvm_va_range_device_p2p.o
+  CC [M]  nvidia-uvm/uvm_va_policy.o
+  CC [M]  nvidia-uvm/uvm_va_block.o
+  CC [M]  nvidia-uvm/uvm_range_group.o
+  CC [M]  nvidia-uvm/uvm_gpu_replayable_faults.o
+  CC [M]  nvidia-uvm/uvm_gpu_non_replayable_faults.o
+  CC [M]  nvidia-uvm/uvm_gpu_access_counters.o
+  CC [M]  nvidia-uvm/uvm_perf_events.o
+  CC [M]  nvidia-uvm/uvm_perf_module.o
+  CC [M]  nvidia-uvm/uvm_mmu.o
+  CC [M]  nvidia-uvm/uvm_pte_batch.o
+  CC [M]  nvidia-uvm/uvm_tlb_batch.o
+  CC [M]  nvidia-uvm/uvm_push.o
+  CC [M]  nvidia-uvm/uvm_pushbuffer.o
+  CC [M]  nvidia-uvm/uvm_thread_context.o
+  CC [M]  nvidia-uvm/uvm_tracker.o
+  CC [M]  nvidia-uvm/uvm_maxwell.o
+  CC [M]  nvidia-uvm/uvm_maxwell_host.o
+  CC [M]  nvidia-uvm/uvm_maxwell_ce.o
+  CC [M]  nvidia-uvm/uvm_maxwell_sec2.o
+  CC [M]  nvidia-uvm/uvm_maxwell_mmu.o
+  CC [M]  nvidia-uvm/uvm_maxwell_fault_buffer.o
+  CC [M]  nvidia-uvm/uvm_maxwell_access_counter_buffer.o
+  CC [M]  nvidia-uvm/uvm_pascal.o
+  CC [M]  nvidia-uvm/uvm_pascal_ce.o
+  CC [M]  nvidia-uvm/uvm_pascal_host.o
+  CC [M]  nvidia-uvm/uvm_pascal_mmu.o
+  CC [M]  nvidia-uvm/uvm_pascal_fault_buffer.o
+  CC [M]  nvidia-uvm/uvm_volta_ce.o
+  CC [M]  nvidia-uvm/uvm_volta_host.o
+  CC [M]  nvidia-uvm/uvm_volta_mmu.o
+  CC [M]  nvidia-uvm/uvm_volta.o
+  CC [M]  nvidia-uvm/uvm_volta_fault_buffer.o
+  CC [M]  nvidia-uvm/uvm_turing.o
+  CC [M]  nvidia-uvm/uvm_turing_access_counter_buffer.o
+  CC [M]  nvidia-uvm/uvm_turing_fault_buffer.o
+  CC [M]  nvidia-uvm/uvm_turing_mmu.o
+  CC [M]  nvidia-uvm/uvm_turing_host.o
+  CC [M]  nvidia-uvm/uvm_ampere.o
+  CC [M]  nvidia-uvm/uvm_ampere_ce.o
+  CC [M]  nvidia-uvm/uvm_ampere_host.o
+  CC [M]  nvidia-uvm/uvm_ampere_fault_buffer.o
+  CC [M]  nvidia-uvm/uvm_ampere_mmu.o
+  CC [M]  nvidia-uvm/uvm_hopper.o
+  CC [M]  nvidia-uvm/uvm_hopper_fault_buffer.o
+  CC [M]  nvidia-uvm/uvm_hopper_ce.o
+  CC [M]  nvidia-uvm/uvm_hopper_host.o
+  CC [M]  nvidia-uvm/uvm_hopper_sec2.o
+  CC [M]  nvidia-uvm/uvm_hopper_mmu.o
+  CC [M]  nvidia-uvm/uvm_ada.o
+  CC [M]  nvidia-uvm/uvm_blackwell.o
+  CC [M]  nvidia-uvm/uvm_blackwell_fault_buffer.o
+  CC [M]  nvidia-uvm/uvm_blackwell_mmu.o
+  CC [M]  nvidia-uvm/uvm_blackwell_host.o
+  CC [M]  nvidia-uvm/uvm_policy.o
+  CC [M]  nvidia-uvm/uvm_perf_utils.o
+  CC [M]  nvidia-uvm/uvm_kvmalloc.o
+  CC [M]  nvidia-uvm/uvm_pmm_sysmem.o
+  CC [M]  nvidia-uvm/uvm_pmm_gpu.o
+  CC [M]  nvidia-uvm/uvm_migrate.o
+  CC [M]  nvidia-uvm/uvm_populate_pageable.o
+  CC [M]  nvidia-uvm/uvm_migrate_pageable.o
+  CC [M]  nvidia-uvm/uvm_map_external.o
+  CC [M]  nvidia-uvm/uvm_user_channel.o
+  CC [M]  nvidia-uvm/uvm_hmm.o
+  CC [M]  nvidia-uvm/uvm_perf_heuristics.o
+  CC [M]  nvidia-uvm/uvm_perf_thrashing.o
+  CC [M]  nvidia-uvm/uvm_perf_prefetch.o
+  CC [M]  nvidia-uvm/uvm_ats.o
+  CC [M]  nvidia-uvm/uvm_ats_faults.o
+  CC [M]  nvidia-uvm/uvm_ats_sva.o
+  CC [M]  nvidia-uvm/uvm_conf_computing.o
+  CC [M]  nvidia-uvm/uvm_test.o
+  CC [M]  nvidia-uvm/uvm_test_rng.o
+  CC [M]  nvidia-uvm/uvm_range_tree_test.o
+  CC [M]  nvidia-uvm/uvm_range_allocator_test.o
+  CC [M]  nvidia-uvm/uvm_gpu_semaphore_test.o
+  CC [M]  nvidia-uvm/uvm_mem_test.o
+  CC [M]  nvidia-uvm/uvm_rm_mem_test.o
+  CC [M]  nvidia-uvm/uvm_page_tree_test.o
+  CC [M]  nvidia-uvm/uvm_tracker_test.o
+  CC [M]  nvidia-uvm/uvm_push_test.o
+  CC [M]  nvidia-uvm/uvm_channel_test.o
+  CC [M]  nvidia-uvm/uvm_ce_test.o
+  CC [M]  nvidia-uvm/uvm_host_test.o
+  CC [M]  nvidia-uvm/uvm_lock_test.o
+  CC [M]  nvidia-uvm/uvm_perf_utils_test.o
+  CC [M]  nvidia-uvm/uvm_kvmalloc_test.o
+  CC [M]  nvidia-uvm/uvm_pmm_test.o
+  CC [M]  nvidia-uvm/uvm_pmm_sysmem_test.o
+  CC [M]  nvidia-uvm/uvm_perf_events_test.o
+  CC [M]  nvidia-uvm/uvm_perf_module_test.o
+  CC [M]  nvidia-uvm/uvm_get_rm_ptes_test.o
+  CC [M]  nvidia-uvm/uvm_fault_buffer_flush_test.o
+  CC [M]  nvidia-uvm/uvm_peer_identity_mappings_test.o
+  CC [M]  nvidia-uvm/uvm_va_block_test.o
+  CC [M]  nvidia-uvm/uvm_range_group_tree_test.o
+  CC [M]  nvidia-uvm/uvm_thread_context_test.o
+  CC [M]  nvidia-uvm/uvm_rb_tree_test.o
+  CC [M]  nvidia-uvm/uvm_sec2_test.o
+  CC [M]  nvidia-uvm/uvm_test_file.o
+  LD [M]  nvidia.o
+ld -r -o nvidia/nv-interface.o nvidia/nv-platform.o nvidia/nv-dsi-parse-panel-props.o nvidia/nv-bpmp.o nvidia/nv-gpio.o nvidia/nv-backlight.o nvidia/nv-imp.o nvidia/nv-platform-pm.o nvidia/nv-ipc-soc.o nvidia/nv.o nvidia/nv-pci.o nvidia/nv-dmabuf.o nvidia/nv-nano-timer.o nvidia/nv-acpi.o nvidia/nv-cray.o nvidia/nv-dma.o nvidia/nv-i2c.o nvidia/nv-mmap.o nvidia/nv-p2p.o nvidia/nv-pat.o nvidia/nv-procfs.o nvidia/nv-usermap.o nvidia/nv-vm.o nvidia/nv-vtophys.o nvidia/os-interface.o nvidia/os-mlock.o nvidia/os-pci.o nvidia/os-registry.o nvidia/os-usermap.o nvidia/nv-modeset-interface.o nvidia/nv-pci-table.o nvidia/nv-kthread-q.o nvidia/nv-memdbg.o nvidia/nv-report-err.o nvidia/nv-rsync.o nvidia/nv-msi.o nvidia/nv-caps.o nvidia/nv-caps-imex.o nvidia/nv-clk.o nvidia/nv-host1x.o nvidia/nv_uvm_interface.o nvidia/libspdm_aead.o nvidia/libspdm_ecc.o nvidia/libspdm_hkdf.o nvidia/libspdm_rand.o nvidia/libspdm_shash.o nvidia/libspdm_rsa.o nvidia/libspdm_aead_aes_gcm.o nvidia/libspdm_sha.o nvidia/libspdm_hmac_sha.o nvidia/libspdm_internal_crypt_lib.o nvidia/libspdm_hkdf_sha.o nvidia/libspdm_ec.o nvidia/libspdm_x509.o nvidia/libspdm_rsa_ext.o nvidia/nvlink_linux.o nvidia/nvlink_caps.o nvidia/linux_nvswitch.o nvidia/procfs_nvswitch.o nvidia/i2c_nvswitch.o
+  LD [M]  nvidia-uvm.o
+  MODPOST Module.symvers
+  CC [M]  nvidia.mod.o
+  CC [M]  .module-common.o
+  CC [M]  nvidia-uvm.mod.o
+  LD [M]  nvidia-uvm.ko
+  LD [M]  nvidia.ko
+  BTF [M] nvidia.ko
+Skipping BTF generation for nvidia.ko due to unavailability of vmlinux
+  BTF [M] nvidia-uvm.ko
+Skipping BTF generation for nvidia-uvm.ko due to unavailability of vmlinux
+make[2]: Leaving directory '/tmp/memory-saver-dkms.84UI7t/dkms/dgx-spark-memory-saver/0.2.0/build/.work/nvidia-580.178.04-uvm-pool'
+make[1]: Leaving directory '/usr/src/linux-headers-7.0.0-1019-nvidia-64k'
+make: Leaving directory '/tmp/memory-saver-dkms.84UI7t/dkms/dgx-spark-memory-saver/0.2.0/build/.work/nvidia-580.178.04-uvm-pool'
+71be610ee3e72e9e9cf02ff87c3c9b591c4c6e382af6c3ba4ab07f2f50c5ca6a /tmp/memory-saver-dkms.84UI7t/dkms/dgx-spark-memory-saver/0.2.0/build/.work/nvidia-580.178.04-uvm-pool/nvidia-uvm.ko
+Built only; signing, installation and loading are separate.
+
+# exit code: 0
+# elapsed time: 00:02:02
+----------------------------------------------------------------

@@ -67,6 +67,11 @@ five serving quality checks on three Sparks. Benchmarks used the same client,
 prompts and pinned speculative-verification costs for the final comparison.
 No request failures, swap growth or thermal slowdown were observed.
 
+Version `0.2.0` also passed an isolated DKMS build/sign on dgx1 and live
+read-only status inspection. Persistent installation/removal and reboot with
+these new helpers still require on-device acceptance; they have not been
+performed on the serving cluster.
+
 See [measurements and limitations](docs/validation.md), the unchanged
 [benchmark reports](results/2026-10-02/), and [test programs](tests/).
 These are bounded tests, not a long production soak or evidence of determinism.

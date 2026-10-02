@@ -1,0 +1,139 @@
+VALIDATION_ROOT=/tmp/memory-saver-dkms.84UI7t
+Generated /tmp/memory-saver-dkms.84UI7t/keys/MOK.priv and /tmp/memory-saver-dkms.84UI7t/keys/MOK.der; not enrolled.
+subject=CN = DGX Spark local module signing
+sha256 Fingerprint=F4:BD:22:82:56:A0:9E:EA:2A:E5:50:A1:A3:FF:A3:5D:1E:33:BC:26:46:90:2A:BA:D9:38:62:57:26:4B:DB:D3
+VALIDATION_UNIT=memory-saver-build-1790934389
+Running as unit: memory-saver-build-1790934389.service; invocation ID: 6be7586cf5904b86a6969c18eeec2ba5
+Deprecated feature: CLEAN (/tmp/memory-saver-dkms.84UI7t/source/dgx-spark-memory-saver-0.2.0/dkms.conf)
+Creating symlink /tmp/memory-saver-dkms.84UI7t/dkms/dgx-spark-memory-saver/0.2.0/source -> /tmp/memory-saver-dkms.84UI7t/source/dgx-spark-memory-saver-0.2.0
+Deprecated feature: CLEAN (/tmp/memory-saver-dkms.84UI7t/dkms/dgx-spark-memory-saver/0.2.0/source/dkms.conf)
+Sign command: /lib/modules/7.0.0-1019-nvidia-64k/build/scripts/sign-file
+Signing key: /tmp/memory-saver-dkms.84UI7t/keys/MOK.priv
+Public certificate (MOK): /tmp/memory-saver-dkms.84UI7t/keys/MOK.der
+
+Building module(s)........................................... done.
+Signing module /tmp/memory-saver-dkms.84UI7t/dkms/dgx-spark-memory-saver/0.2.0/build/.work/nvidia-580.178.04-uvm-pool/nvidia-uvm.ko
+dgx-spark-memory-saver/0.2.0, 7.0.0-1019-nvidia-64k, aarch64: built
+filename:       /tmp/memory-saver-dkms.84UI7t/dkms/dgx-spark-memory-saver/0.2.0/7.0.0-1019-nvidia-64k/aarch64/module/nvidia-uvm.ko
+description:    NVIDIA Unified Virtual Memory kernel module
+version:        580.178.04
+supported:      external
+license:        Dual MIT/GPL
+srcversion:     34683B82C2D3339BBD2EEC9
+depends:        nvidia
+name:           nvidia_uvm
+vermagic:       7.0.0-1019-nvidia-64k SMP preempt mod_unload modversions aarch64
+sig_id:         PKCS#7
+signer:         DGX Spark local module signing
+sig_key:        44:EA:CB:7B:BF:C3:BF:86:0E:A5:BB:6F:37:6F:24:08:24:9F:9E:E7
+sig_hashalgo:   sha512
+signature:      16:74:31:39:43:89:39:B3:3A:04:0E:6D:9C:4D:4C:EA:15:89:B6:3C:
+		FF:76:49:66:4C:CF:F4:57:7D:03:55:E1:96:82:BE:2C:A5:BA:CA:73:
+		D7:53:52:1E:D1:F5:EC:CD:5A:0F:18:B3:13:A2:2F:BA:CA:61:6A:4D:
+		7F:D1:BB:4B:05:12:BB:A6:DE:5A:82:F1:F3:58:1F:4D:53:A3:A2:C1:
+		BD:D6:40:F1:B8:38:BB:40:54:3D:DD:F2:BF:5B:64:51:D6:55:5A:21:
+		B4:2B:90:58:7A:B7:9A:CA:EC:95:5D:C9:40:8D:19:D6:AB:47:21:B8:
+		6E:79:5C:CC:02:CE:30:CD:E6:09:54:A1:95:A7:70:3C:A8:9C:EF:E4:
+		38:17:AA:41:6C:34:11:3E:B3:D1:74:A8:BD:15:2D:F7:16:B8:21:80:
+		CD:E6:F3:4C:B2:28:31:AA:2F:44:BE:FF:CF:F7:6E:CF:37:10:28:05:
+		51:A5:05:29:16:9D:18:E9:44:6E:B2:35:C7:44:B3:C4:B4:90:F8:20:
+		76:BD:63:6A:3B:48:A1:74:71:FE:6D:00:29:35:A2:B0:74:1C:F8:48:
+		99:CC:86:D1:BB:59:26:9D:C1:B7:C9:15:F3:14:E5:79:CD:08:3E:38:
+		B5:50:43:52:29:42:7E:0A:19:4A:1A:EC:17:2B:0E:79:CA:B1:D6:BF:
+		7B:55:2D:3C:F0:3F:24:C4:6E:14:8C:8F:47:AD:5E:68:EB:FD:A6:72:
+		3D:B2:CA:D1:2C:22:1F:39:0D:0C:81:E9:F0:30:F5:5B:FB:4A:21:07:
+		20:C1:59:8B:D3:2C:4E:68:45:67:2A:D5:1A:9C:90:67:A7:F8:F5:46:
+		49:3F:DC:D2:6B:35:66:87:3D:C8:46:FD:60:01:B6:CD:A1:89:AB:C8:
+		D4:67:EB:ED:70:E1:7C:17:C2:F9:D8:0E:2C:AE:49:47:41:32:C7:5D:
+		6B:11:A3:0B:27:EA:FF:22:76:EC:47:2A:F4:B2:EF:31:CF:7E:E1:17:
+		48:00:CA:08
+parm:           uvm_conf_computing_channel_iv_rotation_limit:ulong
+parm:           uvm_ats_mode:Set to 0 to disable ATS (Address Translation Services). Any other value is ignored. Has no effect unless the platform supports ATS. (int)
+parm:           uvm_perf_prefetch_enable:uint
+parm:           uvm_perf_prefetch_threshold:uint
+parm:           uvm_perf_prefetch_min_faults:uint
+parm:           uvm_perf_thrashing_enable:uint
+parm:           uvm_perf_thrashing_threshold:uint
+parm:           uvm_perf_thrashing_pin_threshold:uint
+parm:           uvm_perf_thrashing_lapse_usec:uint
+parm:           uvm_perf_thrashing_nap:uint
+parm:           uvm_perf_thrashing_epoch:uint
+parm:           uvm_perf_thrashing_pin:uint
+parm:           uvm_perf_thrashing_max_resets:uint
+parm:           uvm_perf_map_remote_on_native_atomics_fault:uint
+parm:           uvm_disable_hmm:Force-disable HMM functionality in the UVM driver. Default: true (HMM is not enabled on this CPU architecture). However, even with uvm_disable_hmm=false, HMM will not be enabled if is not supported in this driver build configuration, or if ATS settings conflict with HMM. (bool)
+parm:           uvm_perf_migrate_cpu_preunmap_enable:int
+parm:           uvm_perf_migrate_cpu_preunmap_block_order:uint
+parm:           uvm_global_oversubscription:Enable (1) or disable (0) global oversubscription support. (int)
+parm:           uvm_perf_pma_batch_nonpinned_order:uint
+parm:           uvm_cpu_chunk_allocation_sizes:OR'ed value of all CPU chunk allocation sizes. (uint)
+parm:           uvm_leak_checker:Enable uvm memory leak checking. 0 = disabled, 1 = count total bytes allocated and freed, 2 = per-allocation origin tracking. (int)
+parm:           uvm_force_prefetch_fault_support:uint
+parm:           uvm_debug_enable_push_desc:Enable push description tracking (uint)
+parm:           uvm_debug_enable_push_acquire_info:Enable push acquire information tracking (uint)
+parm:           uvm_page_table_location:Set the location for UVM-allocated page tables. Choices are: vid, sys. (charp)
+parm:           uvm_pack_sysmem_leaf_tables:Pack 256-byte user leaf tables on coherent integrated 64 KiB systems (bool)
+parm:           uvm_perf_access_counter_migration_enable:Whether access counters will trigger migrations.Valid values: <= -1 (default policy), 0 (off), >= 1 (on) (int)
+parm:           uvm_perf_access_counter_batch_count:uint
+parm:           uvm_perf_access_counter_threshold:Number of remote accesses on a region required to trigger a notification.Valid values: [1, 65535] (uint)
+parm:           uvm_perf_reenable_prefetch_faults_lapse_msec:uint
+parm:           uvm_perf_fault_batch_count:uint
+parm:           uvm_perf_fault_replay_policy:uint
+parm:           uvm_perf_fault_replay_update_put_ratio:uint
+parm:           uvm_perf_fault_max_batches_per_service:uint
+parm:           uvm_perf_fault_max_throttle_per_service:uint
+parm:           uvm_perf_fault_coalesce:uint
+parm:           uvm_fault_force_sysmem:Force (1) using sysmem storage for pages that faulted. Default: 0. (int)
+parm:           uvm_perf_map_remote_on_eviction:int
+parm:           uvm_block_cpu_to_cpu_copy_with_ce:Use GPU CEs for CPU-to-CPU migrations. (int)
+parm:           uvm_exp_gpu_cache_peermem:Force caching for mappings to peer memory. This is an experimental parameter that may cause correctness issues if used. (uint)
+parm:           uvm_exp_gpu_cache_sysmem:Force caching for mappings to system memory. This is an experimental parameter that may cause correctness issues if used. (uint)
+parm:           uvm_downgrade_force_membar_sys:Force all TLB invalidation downgrades to use MEMBAR_SYS (uint)
+parm:           uvm_channel_num_gpfifo_entries:uint
+parm:           uvm_channel_gpfifo_loc:charp
+parm:           uvm_channel_gpput_loc:charp
+parm:           uvm_channel_pushbuffer_loc:charp
+parm:           uvm_enable_va_space_mm:Set to 0 to disable UVM from using mmu_notifiers to create an association between a UVM VA space and a process. This will also disable pageable memory access via either ATS or HMM. (int)
+parm:           uvm_enable_debug_procfs:Enable debug procfs entries in /proc/driver/nvidia-uvm (int)
+parm:           uvm_peer_copy:Choose the addressing mode for peer copying, options: phys [default] or virt. Valid for Ampere+ GPUs. (charp)
+parm:           uvm_debug_prints:Enable uvm debug prints. (int)
+parm:           uvm_enable_builtin_tests:Enable the UVM built-in tests. (This is a security risk) (int)
+parm:           uvm_release_asserts:Enable uvm asserts included in release builds. (int)
+parm:           uvm_release_asserts_dump_stack:dump_stack() on failed UVM release asserts. (int)
+parm:           uvm_release_asserts_set_global_error:Set UVM global fatal error on failed release asserts. (int)
+{
+  "kernel": "7.0.0-1019-nvidia",
+  "page_size": "4096",
+  "rm_version": "580.178.04",
+  "uvm_loaded": true,
+  "loaded_srcversion": "09F2A78862D06017E9324B6",
+  "packing": null,
+  "current_disk": {
+    "filename": "/lib/modules/7.0.0-1019-nvidia/kernel/nvidia-580-open/nvidia-uvm.ko",
+    "version": "580.178.04",
+    "srcversion": "09F2A78862D06017E9324B6",
+    "signer": "Canonical Ltd. Kernel Module Signing",
+    "packing_parameter": false
+  },
+  "target_disk": {
+    "filename": "/lib/modules/7.0.0-1019-nvidia-64k/kernel/nvidia-580-open/nvidia-uvm.ko",
+    "version": "580.178.04",
+    "srcversion": "09F2A78862D06017E9324B6",
+    "signer": "Canonical Ltd. Kernel Module Signing",
+    "packing_parameter": false
+  },
+  "target_rm_version": "580.178.04",
+  "secure_boot": "SecureBoot enabled",
+  "manual_install": null,
+  "dkms": [],
+  "issues": [],
+  "unknowns": [],
+  "state": "stock-loaded"
+}
+ISOLATED_BUILD_FINISHED
+Finished with result: success
+Main processes terminated with: code=exited/status=0
+Service runtime: 2min 3.200s
+CPU time consumed: 2min 2.922s
+Memory peak: 938.6M
+Memory swap peak: 0B
