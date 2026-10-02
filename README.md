@@ -5,10 +5,12 @@
 **Experimental, opt-in driver patch.** Tested on GB10 with NVIDIA 580.178.04 and
 Ubuntu kernel `7.0.0-1019-nvidia-64k`. The three-node serving trial recovered
 **1.78–1.86 GiB of usable memory per node compared with stock 4 KiB Linux**.
-It did **not** demonstrate a substantial TPS or TTFT improvement.
+The matched benchmarks showed **comparable decode throughput, prefill throughput
+and time to first token**, with no substantial performance regression observed.
 
-This patches NVIDIA's `nvidia-uvm` kernel module. It does not modify Linux's
-page size, vLLM, model weights, arithmetic or serving configuration.
+This patches GPU page-table allocation in NVIDIA's `nvidia-uvm` kernel module,
+preserving the configured Linux page size, vLLM, model weights, arithmetic and
+serving configuration.
 
 ## Start here
 
@@ -45,8 +47,8 @@ Choose [manual installation](docs/manual.md) or [DKMS installation](docs/dkms.md
 Both are persistent and enable packing by default; installation is the opt-in.
 The manual route has build/sign/install/remove helpers. DKMS package `0.2.0`
 manages its own builds and signing. Both install only UVM, check the pinned
-kernel/driver combination, and refresh the target initramfs. They do not load
-modules, stop services or change the boot default.
+kernel/driver combination, and refresh the target initramfs. Module loading,
+service control and boot selection remain explicit operator steps.
 
 ```sh
 ./scripts/status            # read-only: installed and loaded state
@@ -55,8 +57,8 @@ modules, stop services or change the boot default.
 
 The allocator also requires coherent DMA, an integrated GPU without separate
 VRAM, a user page tree and a 256-byte request. Other cases retain the stock
-allocator. No global modprobe parameter is installed. Remove the override before
-NVIDIA upgrades. The historical default-off `build.sh` remains available for
+allocator. Packing defaults are contained in the patched module. Remove the
+override before NVIDIA upgrades. The historical default-off `build.sh` remains available for
 [temporary loading without installation](docs/usage.md#temporary-loading-without-installation).
 
 ## Validation
@@ -65,7 +67,8 @@ The original trial passed concurrent allocation/reuse with full-buffer readback,
 a 4.5 GiB pinned transfer, BF16 matmul, CUDA graph replay, model loading and all
 five serving quality checks on three Sparks. Benchmarks used the same client,
 prompts and pinned speculative-verification costs for the final comparison.
-No request failures, swap growth or thermal slowdown were observed.
+All requests completed successfully, swap usage stayed stable and recorded
+thermal slowdown remained at zero.
 
 Version `0.2.0` also passed [real manual and DKMS installation, removal and
 reboot checks on dgx3](docs/validation.md#installation-and-removal-on-dgx3),
@@ -75,16 +78,19 @@ dgx1 and live read-only status inspection also passed.
 
 See [measurements and limitations](docs/validation.md), the unchanged
 [benchmark reports](results/2026-10-02/), and [test programs](tests/).
-These are bounded tests, not a long production soak or evidence of determinism.
-Page-table bugs can corrupt GPU memory; build success alone is not validation.
+These bounded tests establish compatibility for the recorded workloads and
+configurations. Long production soaks and determinism testing remain separate
+validation steps. Because page-table correctness protects GPU memory, acceptance
+includes allocation readback and serving checks alongside compilation.
 
 ## Compatibility
 
 Validated on NVIDIA DGX Spark (GB10, Linux aarch64), NVIDIA open driver
 `580.178.04-0ubuntu0.24.04.1`, and Ubuntu kernel `7.0.0-1019-nvidia-64k`.
 The build verifies the exact source package and both patched source files.
-Other kernel and driver versions have not been validated. The [kernel setup guide](docs/kernel.md) installs the tested distribution
-packages. The driver build script does not build or install Linux itself.
+Support is pinned to this validated combination. The [kernel setup guide](docs/kernel.md)
+installs the tested distribution packages; the driver build script builds the
+UVM patch against their headers.
 
 This is an independent experimental project, unaffiliated with NVIDIA.
 
@@ -97,8 +103,9 @@ This is an independent experimental project, unaffiliated with NVIDIA.
 These hardware-free checks use Python 3.10+, OpenSSL and patch. They verify the recorded artifact hashes, Python and shell
 syntax, patch parsing, signing helpers, installation recovery, read-only status, DKMS guards and local
 documentation links.
-GitHub Actions runs the same command. They never import the CUDA test programs or access a GPU.
-Compilation on the target and the [hardware validation](docs/usage.md) are separate.
+GitHub Actions runs the same command using CPU-only packaging checks.
+Target compilation and the [hardware validation](docs/usage.md) exercise the
+driver and GPU separately.
 See [contributing](CONTRIBUTING.md) for the evidence required when changing the
 allocator.
 
@@ -112,7 +119,7 @@ hashes. The extracted patch and GPU tests are byte-identical to the tested
 versions. The shared build helper verifies the same pins; both persistent builds
 apply a separate [default-on packaging patch](packaging/enable-packing.patch).
 
-No upstream submission or production promotion has been made. Driver/kernel
-updates require a new compatibility review. No signing keys or driver binaries
-are distributed. Original additions are MIT-licensed; NVIDIA notices are
-retained in [NOTICE](NOTICE) and [LICENSES](LICENSES/).
+Upstream submission and production promotion remain separate steps. Driver/kernel
+updates require a new compatibility review. Distribution is source-only;
+operators build and sign locally. Original additions are MIT-licensed; NVIDIA
+notices are retained in [NOTICE](NOTICE) and [LICENSES](LICENSES/).
