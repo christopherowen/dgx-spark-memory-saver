@@ -16,11 +16,12 @@ page size, vLLM, model weights, arithmetic or serving configuration.
 | --- | --- |
 | See how much memory it saves | [Measurements and limitations](docs/validation.md) |
 | Install the 64 KiB kernel and prerequisites | [Kernel packages, swap and boot checks](docs/kernel.md) |
-| Build and sign the patched driver manually | [Build tools and Secure Boot](docs/installation.md) |
+| Install manually with Secure Boot | [Prerequisites and signing](docs/installation.md), [manual installation](docs/manual.md) |
 | Install it persistently with DKMS | [DKMS, signing, activation and removal](docs/dkms.md) |
-| Try it and verify it is working | [Loading, verification and rollback](docs/usage.md) |
+| Check what is installed and loaded | [Read-only status and verification](docs/usage.md) |
 | Uninstall the DKMS patch | [Remove and verify stock UVM](docs/dkms.md#remove-and-restore-stock-uvm) |
-| Unload the manual build or return to 4 KiB | [Updates and removal](docs/maintenance.md) |
+| Remove the manual installation | [Manual removal](docs/manual.md#remove) |
+| Return to 4 KiB or handle updates | [Updates and removal](docs/maintenance.md) |
 | Understand the allocation change | [Design and lifetime rules](docs/design.md) |
 
 ## Why it helps
@@ -40,19 +41,23 @@ Root tables and other allocation sizes retain their original allocation.
 
 ## Activation and rollback
 
-Choose the [manual build and load](docs/usage.md) or [DKMS installation](docs/dkms.md).
-The manual build is disabled by default and uses the explicit parameter
-`uvm_pack_sysmem_leaf_tables=1`. Installing DKMS package `0.1.0` is the persistent
-opt-in: that build enables packing by default, supports only the pinned 64 KiB
-kernel, and registers only UVM. DKMS handles signing, installation and removal;
-its install/remove hooks refresh the target initramfs.
+Choose [manual installation](docs/manual.md) or [DKMS installation](docs/dkms.md).
+Both are persistent and enable packing by default; installation is the opt-in.
+The manual route has build/sign/install/remove helpers. DKMS package `0.2.0`
+manages its own builds and signing. Both install only UVM, check the pinned
+kernel/driver combination, and refresh the target initramfs. They do not load
+modules, stop services or change the boot default.
 
-The path also requires coherent DMA, a real integrated GPU with no separate
-VRAM, a user page tree and a 256-byte table request. Other cases retain the stock
-allocator. No global modprobe parameter is installed, so stock modules on the
-4 KiB fallback do not receive an unknown option. Remove the DKMS override before
-upgrading NVIDIA packages. DKMS integration has hardware-free test coverage;
-its on-device install/remove and boot acceptance remains outstanding.
+```sh
+./scripts/status            # read-only: installed and loaded state
+./scripts/status --json     # the same findings in machine-readable form
+```
+
+The allocator also requires coherent DMA, an integrated GPU without separate
+VRAM, a user page tree and a 256-byte request. Other cases retain the stock
+allocator. No global modprobe parameter is installed. Remove the override before
+NVIDIA upgrades. The historical default-off `build.sh` remains available for
+[temporary loading without installation](docs/usage.md#temporary-loading-without-installation).
 
 ## Validation
 
@@ -83,8 +88,9 @@ This is an independent experimental project, unaffiliated with NVIDIA.
 ./scripts/check
 ```
 
-These hardware-free checks verify the recorded artifact hashes, Python and shell
-syntax, patch parsing, DKMS build/install guards and local documentation links.
+These hardware-free checks use Python 3.10+, OpenSSL and patch. They verify the recorded artifact hashes, Python and shell
+syntax, patch parsing, signing helpers, installation recovery, read-only status, DKMS guards and local
+documentation links.
 GitHub Actions runs the same command. They never import the CUDA test programs or access a GPU.
 Compilation on the target and the [hardware validation](docs/usage.md) are separate.
 See [contributing](CONTRIBUTING.md) for the evidence required when changing the
@@ -97,8 +103,8 @@ This is the development home for the patch originally tested in
 That repository retains its historical experiment snapshot.
 [provenance.json](provenance.json) records the source identity and copied-file
 hashes. The extracted patch and GPU tests are byte-identical to the tested
-versions. The shared build helper verifies the same pins; the DKMS build
-applies a separate [default-on packaging patch](packaging/dkms-enable-packing.patch).
+versions. The shared build helper verifies the same pins; both persistent builds
+apply a separate [default-on packaging patch](packaging/enable-packing.patch).
 
 No upstream submission or production promotion has been made. Driver/kernel
 updates require a new compatibility review. No signing keys or driver binaries

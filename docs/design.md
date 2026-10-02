@@ -40,8 +40,9 @@ All of these must hold:
 - There is a real PCI device, marked as an integrated GPU with no separate VRAM.
 - The device uses coherent DMA.
 
-The historical/manual patch defaults the parameter off. The separate DKMS
-packaging patch defaults it on: installation is the persistent opt-in. No
+The historical temporary-load patch defaults the parameter off. The separate
+packaging patch used by both persistent manual and DKMS builds defaults it on:
+installation is the persistent opt-in. No
 allocator condition or synchronization changes between the two builds.
 
 The tested hardware is GB10. The predicates are not a compatibility claim for

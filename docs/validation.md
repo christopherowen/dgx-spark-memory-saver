@@ -120,3 +120,20 @@ These checks do not establish a DKMS target compilation, signing, installation,
 removal or reboot result. Those operations have not been performed on the
 Sparks for this packaging release. Follow the [DKMS acceptance procedure](dkms.md)
 in a coordinated maintenance window before deployment.
+
+## Installation tools (0.2.0)
+
+Both persistent build routes now use the same default-on packaging patch. The
+original allocator patch and historical evidence remain unchanged. The manual
+installer records the exact installed artifact and leaves the packaged module
+in place. Its remover checks ownership, restores module selection and retains
+a recovery receipt after failed refreshes. Neither command loads modules or
+controls services. The status command only reads system state.
+
+The hardware-free suite exercises real disposable key generation and certificate
+checks, signing orchestration, signed/unsigned installation policy, driver
+identity checks, conflicting registrations, changed artifacts, interrupted
+installation/removal and read-only status reporting. All host mutations in
+those tests are isolated filesystem fixtures or command doubles. Manual and
+system DKMS installation, removal and reboot remain unvalidated on the Sparks
+until a coordinated deployment window.

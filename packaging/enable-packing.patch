@@ -6,7 +6,7 @@
  // small user leaf table a separate 4 KiB slot. Roots and other table sizes
 -// retain their original allocation. Disabled by default and inert on 4 KiB.
 -static bool uvm_pack_sysmem_leaf_tables;
-+// retain their original allocation. DKMS installation opts in; inert on 4 KiB.
++// retain their original allocation. Installation opts in; inert on 4 KiB.
 +static bool uvm_pack_sysmem_leaf_tables = true;
  module_param(uvm_pack_sysmem_leaf_tables, bool, S_IRUGO);
  MODULE_PARM_DESC(uvm_pack_sysmem_leaf_tables,

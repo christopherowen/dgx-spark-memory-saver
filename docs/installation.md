@@ -1,25 +1,25 @@
-# Install prerequisites, build and sign
+# Installation and signing
 
-[← README](../README.md) · [Kernel setup](kernel.md) · [Manual build and load](usage.md) · [Updates and removal](maintenance.md)
+[← README](../README.md) · [Kernel setup](kernel.md) · [Manual installation](manual.md) · [DKMS](dkms.md)
 
-The order is: **get this project → install the kernel and tools → build and sign
-UVM → boot the candidate kernel once → load, validate and roll back**.
+The order is: **get this project → install prerequisites → enroll a signing key
+→ choose manual or DKMS installation → load and verify**.
 
-## 1. Get the source and install prerequisites
+## 1. Get the source and prerequisites
 
-On the Spark, get the checkout and run the hardware-free checks:
+On the Spark:
 
 ```sh
 sudo apt-get update
-sudo env NEEDRESTART_MODE=l apt-get --no-remove install git python3
+sudo env NEEDRESTART_MODE=l apt-get --no-remove install git python3 openssl patch
 git clone https://github.com/christopherowen/dgx-spark-memory-saver.git
 cd dgx-spark-memory-saver
 ./scripts/check
 ```
 
-Use [the complete kernel setup guide](kernel.md) to preserve the stock boot
-entry, install the exact packages and prepare compatible swap. Its package
-list includes:
+Follow [kernel setup](kernel.md) to preserve the stock boot entry, install the
+exact packages and prepare compatible swap. Already-prepared machines should
+verify their identities instead of repeating preparation.
 
 | Requirement | Tested package or tool |
 | --- | --- |
@@ -30,123 +30,87 @@ list includes:
 | NVIDIA source | `nvidia-kernel-source-580-open=580.178.04-0ubuntu0.24.04.1` |
 | Compiler and build tools | `build-essential`, `gcc-13`, `patch`, `coreutils` |
 | Inspection and boot support | `kmod`, `dkms`, `initramfs-tools`, `util-linux`, `psmisc` |
-| Signing | `openssl`, `mokutil` |
+| Signing and checks | Python 3.10+, `openssl`, `mokutil` |
 
-Exact kernel-package versions and installation commands are in that guide.
-Already-prepared machines should verify those identities instead of repeating
-host preparation. CUDA development packages, PyTorch and bpftrace are **not**
-needed to compile this kernel module.
+Exact kernel-package versions and installation commands are in the kernel
+guide. CUDA development packages, PyTorch and bpftrace are not needed to compile
+this kernel module. Hardware-free tests use disposable local signing keys;
+they never enroll them, access a GPU or modify system installation paths.
 
-## Choose an installation route
+## 2. Generate or select a signing key
 
-For persistent installation, follow [DKMS setup](dkms.md). DKMS handles module
-signing itself, using the enrolled key established below; do not manually sign
-DKMS build output. The remaining steps on this page describe the manual build and load.
+If fan-control already uses an enrolled key, reuse it. Set the directory that
+contains its `MOK.priv` and `MOK.der`, for example through your existing
+`DGX_MOK_DIR` setting. Do not generate a new key for each build.
 
-## 2. Build the patched UVM module
-
-From the checkout root as your ordinary user:
+For a new pair:
 
 ```sh
-./scripts/build.sh
+./scripts/generate-signing-key
 ```
 
-The script verifies the source package version and SHA-256 of both patched
-files, copies the source into `.work/nvidia-580.178.04-uvm-pool`, applies the
-patch without fuzz, and builds against the pinned headers. It refuses to reuse
-an existing build directory. The resulting module is
-`.work/nvidia-580.178.04-uvm-pool/nvidia-uvm.ko`.
-
-The build does not install, sign or load modules, alter boot defaults, or update
-initramfs. It also builds RM to resolve module symbols; only UVM was replaced in
-the trial. Keep the packaged RM module rather than replacing it with that build
-output. Record the printed unsigned module hash before signing.
+The default directory is
+`$HOME/.local/share/dgx-spark-memory-saver/keys`. An explicit directory can be
+selected with `DGX_MOK_DIR` or `--key-dir`. The helper refuses existing files,
+verifies that the generated key matches the certificate, and creates a mode
+0600 private key. The certificate is marked for module signing. Nothing is
+enrolled or installed by this command.
 
 ## 3. Sign for Secure Boot
 
-Check `mokutil --sb-state`. With Secure Boot enforced, the replacement module
-must be signed by an enrolled key. The trial kept Secure Boot enabled. These
-steps follow [Ubuntu's module signing and MOK model](https://documentation.ubuntu.com/security/security-features/platform-protections/secure-boot/).
+Check `mokutil --sb-state`. The recorded hardware tests kept Secure Boot enabled.
+Custom modules need a signature from a certificate enrolled on the target host;
+see [Ubuntu's Secure Boot and MOK model](https://documentation.ubuntu.com/security/security-features/platform-protections/secure-boot/).
 
-### Reuse an existing enrolled key
-
-If you already use an enrolled key for the fan controller or another module,
-reuse it. Set the directory containing `MOK.priv` and `MOK.der`:
+For a new key, request enrollment:
 
 ```sh
-# Replace this with the actual directory containing your existing key pair.
-export DGX_MOK_DIR="/absolute/path/to/your/keys"
-sudo mokutil --test-key "$DGX_MOK_DIR/MOK.der"
-```
-
-Require confirmation that the certificate is enrolled. A generated certificate
-or pending import is insufficient. Keep the private key outside this checkout.
-If the key is root-owned, use `sudo` for signing rather than making it readable
-to other users.
-
-### Create and enroll a key if you do not have one
-
-This creates a fresh local pair, refusing to overwrite existing files:
-
-```bash
-export DGX_MOK_DIR="$HOME/.local/share/dgx-spark-memory-saver/keys"
-(
-  set -euo pipefail
-  umask 077
-  mkdir -p "$DGX_MOK_DIR"
-  chmod 700 "$DGX_MOK_DIR"
-  test ! -e "$DGX_MOK_DIR/MOK.priv"
-  test ! -e "$DGX_MOK_DIR/MOK.der"
-  openssl req -new -x509 -newkey rsa:3072 -nodes -days 3650 \
-    -subj '/CN=DGX Spark local module signing/' \
-    -addext 'extendedKeyUsage=codeSigning' \
-    -keyout "$DGX_MOK_DIR/MOK.priv" -outform DER -out "$DGX_MOK_DIR/MOK.der"
-  chmod 600 "$DGX_MOK_DIR/MOK.priv"
-)
+export DGX_MOK_DIR="${DGX_MOK_DIR:-$HOME/.local/share/dgx-spark-memory-saver/keys}"
 sudo mokutil --import "$DGX_MOK_DIR/MOK.der"
 ```
 
-Choose a temporary enrollment password. During a planned reboot into the stock
-kernel, use the firmware MOK console: **Enroll MOK → Continue → Yes**, enter
-the password, and reboot. This needs console access; SSH does not complete it.
-After reconnecting, set `DGX_MOK_DIR` again and run
-`sudo mokutil --test-key "$DGX_MOK_DIR/MOK.der"`. Verify enrollment before
-arming the one-shot 64 KiB boot. Enroll the signing certificate on every machine
-where you intend to load a module signed with that key; distribute the public
-certificate, not the private key.
-
-### Sign the built module
-
-From the checkout root with `DGX_MOK_DIR` set to the verified enrolled pair:
+Choose a temporary password. During a planned reboot into the stock kernel, use
+**Enroll MOK → Continue → Yes** at the firmware console, enter the password,
+and complete the reboot. SSH does not complete the firmware step. After
+reconnecting, restore `DGX_MOK_DIR` if needed and verify:
 
 ```sh
-sudo /lib/modules/7.0.0-1019-nvidia-64k/build/scripts/sign-file sha256 \
-  "$DGX_MOK_DIR/MOK.priv" "$DGX_MOK_DIR/MOK.der" \
-  .work/nvidia-580.178.04-uvm-pool/nvidia-uvm.ko
-modinfo -F signer .work/nvidia-580.178.04-uvm-pool/nvidia-uvm.ko
-modinfo -F vermagic .work/nvidia-580.178.04-uvm-pool/nvidia-uvm.ko
-sha256sum .work/nvidia-580.178.04-uvm-pool/nvidia-uvm.ko
+sudo mokutil --test-key "$DGX_MOK_DIR/MOK.der"
 ```
 
-Record the signed hash too. The vermagic must match the candidate kernel and
-the signer your enrolled certificate. On a machine intentionally running
-without signature enforcement, signing may be skipped; this project does not
-require disabling Secure Boot.
+Require the affirmative enrollment message, not merely an exit code: the DGX OS
+version can return 1 even while reporting that the certificate is enrolled.
+`build-sign` checks that exact message itself. Certificate enrollment is needed
+on every target host; distribute the public certificate, not the private key.
 
-## 4. Boot and validate
+For a root-owned existing key, run the helper as its owner with an explicit
+`--key-dir`; do not make the private key readable to other users. DKMS's
+persistent signing configuration is described in its own guide.
 
-Continue at [the one-shot kernel boot](kernel.md#6-boot-once-into-64-kib), then
-[load and verify the replacement UVM module](usage.md#load-and-verify).
-Copying or signing a module does not activate it. This manual route makes no
-persistent installation; [DKMS](dkms.md) provides that separate route.
+## 4. Choose an installation route
 
-For the GPU tests, use an existing compatible CUDA/PyTorch environment: the
-recorded test used PyTorch `2.13.0+cu130` in the serving image. Its exact image
-identity is in the result files. Both test programs require PyTorch and access
-to the host driver; a full CUDA toolkit is not required by the Python programs.
-Changing the PyTorch environment is a new test condition and should be recorded.
+| Route | Build/sign | Persistence and removal |
+| --- | --- | --- |
+| [Manual installation](manual.md) | `./scripts/build-sign` | `install-manual` / `remove-manual`; survives reboot |
+| [DKMS installation](dkms.md) | DKMS builds and signs with its configured key | DKMS manages registration and removal for the supported combination |
 
-`bpftrace` is optional and only needed for the allocation-attribution diagnostic.
-Install it with `sudo apt-get --no-remove install bpftrace` if performing that
-trace. Follow [the trace limits](usage.md#trace-separately-from-timing); do not
-run instrumentation during throughput measurements.
+Both persistent builds enable packing by default and preserve the same
+allocator predicates. Neither installs a global modprobe option. Both must be
+removed before upgrading NVIDIA packages. They cannot coexist on the same
+kernel. Installation does not load the module or change boot defaults.
+
+For a temporary explicit load without installation, the historical default-off
+build remains available as `./scripts/build.sh`; see
+[temporary loading](usage.md#temporary-loading-without-installation).
+
+## Test dependencies
+
+Use an existing compatible CUDA/PyTorch environment for hardware tests. The
+recorded test used PyTorch `2.13.0+cu130` in the serving image; its identity is
+in the result files. Both test programs require PyTorch and host-driver access,
+but no full CUDA toolkit. Record changes to that environment as new conditions.
+
+`bpftrace` is optional, for allocation-attribution diagnostics only. Install it
+with `sudo apt-get --no-remove install bpftrace` when needed, and follow
+[the trace limits](usage.md#trace-separately-from-timing). Instrumentation must
+be stopped before throughput measurements.

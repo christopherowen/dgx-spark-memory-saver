@@ -15,7 +15,7 @@ import unittest
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
-loader = importlib.machinery.SourceFileLoader('driver_build', str(ROOT / 'scripts/driver-build'))
+loader = importlib.machinery.SourceFileLoader('driver_build', str(ROOT / 'scripts/driver_build.py'))
 spec = importlib.util.spec_from_loader(loader.name, loader)
 driver = importlib.util.module_from_spec(spec)
 loader.exec_module(driver)
@@ -92,7 +92,7 @@ class BuildChecks(unittest.TestCase):
             driver.build(driver.KERNEL, self.headers, dkms=dkms)
             applied = [Path(c[-1]).name for c in self.calls if c[0] == 'patch']
             self.assertEqual(applied, ['0001-pack-user-leaf-tables.patch'] +
-                             (['dkms-enable-packing.patch'] if dkms else []))
+                             (['enable-packing.patch'] if dkms else []))
             self.assertEqual(before, {p: p.read_bytes() for p in before})
             driver.clean()
         self.assertFalse(self.work.exists())
@@ -190,7 +190,7 @@ source ./dkms.conf
 printf '%s\\n' "$PACKAGE_NAME" "$PACKAGE_VERSION" "${#BUILT_MODULE_NAME[@]}" "${BUILT_MODULE_NAME[0]}" "$AUTOINSTALL" "$BUILD_EXCLUSIVE_KERNEL" "$BUILD_EXCLUSIVE_ARCH" "$PRE_INSTALL" "$POST_INSTALL" "$POST_REMOVE"
 '''
         values = subprocess.check_output(['bash', '-c', shell], cwd=ROOT, text=True).splitlines()
-        self.assertEqual(values[:5], ['dgx-spark-memory-saver', '0.1.0', '1', 'nvidia-uvm', 'yes'])
+        self.assertEqual(values[:5], ['dgx-spark-memory-saver', '0.2.0', '1', 'nvidia-uvm', 'yes'])
         self.assertRegex(driver.KERNEL, values[5])
         self.assertIsNone(re.fullmatch(values[5], '7.0.0-1019-nvidia'))
         self.assertIsNone(re.fullmatch(values[5], '7.0.0-1020-nvidia-64k'))
@@ -211,10 +211,10 @@ printf '%s\\n' "$PACKAGE_NAME" "$PACKAGE_VERSION" "${#BUILT_MODULE_NAME[@]}" "${
             source.parent.mkdir()
             source.write_text(additions)
             subprocess.run(['patch', '-d', tmp, '-p1', '--fuzz=0', '--batch', '-i',
-                            str(ROOT / 'packaging/dkms-enable-packing.patch')], check=True,
+                            str(ROOT / 'packaging/enable-packing.patch')], check=True,
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             expected = additions.replace('Disabled by default and inert on 4 KiB.',
-                                         'DKMS installation opts in; inert on 4 KiB.').replace(
+                                         'Installation opts in; inert on 4 KiB.').replace(
                 'static bool uvm_pack_sysmem_leaf_tables;', 'static bool uvm_pack_sysmem_leaf_tables = true;')
             self.assertEqual(source.read_text(), expected)
 

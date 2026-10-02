@@ -1,16 +1,56 @@
-# Load, verify and unload the manual build
+# Status, loading and validation
 
-First complete [kernel and prerequisite setup](kernel.md) and
-[build and signing](installation.md). These are operator instructions, not an
-automatic installation procedure. Loading with `insmod` lasts until the module
-is unloaded or the machine reboots; use DKMS for persistent installation.
-These commands assume the manual route, with no memory-saver DKMS override
-installed. If using DKMS, follow [DKMS load/removal](dkms.md) instead.
-Coordinate an exclusive window and stop all GPU clients before changing UVM.
-For distributed serving, every rank must use the same kernel and module.
-Retain a known-working stock kernel and a recovery path.
+[← README](../README.md) · [Manual installation](manual.md) · [DKMS](dkms.md) · [Removal](maintenance.md)
 
-## Build and identity
+## Read-only status
+
+From the checkout, without sudo:
+
+```sh
+./scripts/status
+./scripts/status --json
+```
+
+This reports the running kernel/page size, loaded NVIDIA RM/UVM identities,
+packing parameter, selected UVM files for the running and supported kernels,
+Secure Boot, DKMS registration and manual installation receipt. It uses sysfs
+and read-only inspection commands; it does not initialize CUDA, allocate GPU
+memory, load modules or repair anything.
+
+| Result | Meaning |
+| --- | --- |
+| `packing-enabled` | Compatible loaded module has its packing parameter enabled |
+| `packing-disabled` | Patched module is loaded with the parameter disabled |
+| `stock-loaded` | Loaded module has no packing parameter and matches disk |
+| `uvm-not-loaded` | No UVM module is currently loaded |
+| `needs-attention` | Known mismatch, conflicting installation or incomplete operation |
+| `unverified` | A required identity or registration could not be inspected |
+
+Exit status is 0 for consistent inspected state, 1 for a detected problem, and
+2 for incomplete inspection or an unsupported inspection platform. A status of
+`packing-enabled` is not a memory-savings measurement and does not establish
+that every allocation meets the packing predicates. JSON preserves both raw
+fields and findings for automation. Suggested responses are in
+[troubleshooting](troubleshooting.md).
+
+## Load and verify
+
+After completing either persistent installation, coordinate a maintenance
+window and stop GPU clients before replacing a loaded module. Follow the
+load steps in the [manual guide](manual.md#load-and-verify) or
+[DKMS guide](dkms.md#5-load-and-verify), then run `./scripts/status`.
+All ranks of distributed serving must use matching kernel/driver/module state.
+Run the validation below before serving. Installation and removal never stop
+workloads or load/unload UVM automatically.
+
+## Temporary loading without installation
+
+This optional path uses the historical default-off build and explicit `=1`.
+It lasts until unload or reboot. It assumes **neither** persistent manual nor
+DKMS memory-saver installation is present. Use their removal guides otherwise.
+Retain a known-working stock kernel and recovery access.
+
+### Build and identity
 
 Run `scripts/build.sh` as an ordinary user. It requires the pinned source package
 and staged 64 KiB headers, but does not require the candidate kernel to be running
@@ -31,9 +71,19 @@ identify the tested artifacts; a new build may have a different binary hash.
 Secure Boot requires signing the module with a locally held, enrolled key using
 the target headers' `scripts/sign-file`. Keep keys outside this repository. The
 original trial used an existing enrolled key and left Secure Boot enabled.
-A signature is a loading requirement, not proof of correctness.
+For this temporary build only, sign the output directly after selecting your
+enrolled `DGX_MOK_DIR`:
 
-## Load and verify
+```sh
+sudo /lib/modules/7.0.0-1019-nvidia-64k/build/scripts/sign-file sha256 \
+  "$DGX_MOK_DIR/MOK.priv" "$DGX_MOK_DIR/MOK.der" \
+  .work/nvidia-580.178.04-uvm-pool/nvidia-uvm.ko
+```
+
+A signature is a loading requirement, not proof of correctness. The combined
+`build-sign` helper instead produces the persistent default-on build.
+
+### Load the temporary module
 
 With all GPU clients stopped, confirm that `/dev/nvidia-uvm` has no users. Load
 only the built UVM module; keep the packaged RM, modeset and DRM modules.
@@ -108,8 +158,8 @@ boot path; the recorded fleet retained 4 KiB as its normal default.
 Verify that the custom parameter is absent and that all nodes agree before
 restoring distributed serving.
 
-Persistent installation is available through [DKMS](dkms.md). Its default-on
-build and installed override have their own removal procedure; do not use the
-manual rollback to claim a DKMS installation has been removed. A global modprobe
+Persistent installation is available through [manual installation](manual.md)
+or [DKMS](dkms.md). Their installed overrides have separate removal procedures;
+this temporary-load rollback does not uninstall either one. A global modprobe
 parameter would break stock UVM versions that do not recognize it. No production
 promotion is implied by adding the DKMS packaging.

@@ -193,7 +193,7 @@ manual setup; retain it if your operator already manages swap that way.
 
 ## 5. Build and sign before rebooting into 64 KiB
 
-Follow [build and signing](installation.md#2-build-the-patched-uvm-module).
+Follow [signing and installation](installation.md#4-choose-an-installation-route).
 Compilation can happen while still running the stock 4 KiB kernel. If a new
 signing key needs enrollment, complete its firmware-console enrollment and
 verify it on the stock kernel before booting into 64 KiB.

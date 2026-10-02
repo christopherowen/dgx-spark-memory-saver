@@ -5,7 +5,7 @@ driver package and source identity in reports. This repository follows the
 focused driver, documentation and hardware-free check layout used by
 [dgx-spark-fan-control](https://github.com/christopherowen/dgx-spark-fan-control).
 
-Run `./scripts/check` before submitting. These checks must remain usable without
+Run `./scripts/check` before submitting (Python 3.10+, OpenSSL and patch). These checks must remain usable without
 CUDA, root access or a Spark. Do not import the hardware test programs from a
 discovered unit test: importing them can initialize CUDA and allocate memory.
 
@@ -33,3 +33,8 @@ acceptance.
 Do not commit signing keys, module binaries, credentials or private machine logs.
 Preserve NVIDIA's MIT notices and the repository's licensing when editing the
 patch. Keep production orchestration in the deployment repository.
+
+Manual installation/removal tests must use temporary state/module/sysfs paths
+and mocked host commands. Key-generation tests use disposable keys and never
+enroll them. Status remains read-only and must distinguish missing evidence
+from a healthy state. Preserve recovery receipts when a mutation fails.

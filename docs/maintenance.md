@@ -1,29 +1,28 @@
 # Updates and removal
 
-[← README](../README.md) · [Build](installation.md) · [Manual build and load](usage.md)
-
-For an installed DKMS build, use [DKMS removal and restoration](dkms.md#remove-and-restore-stock-uvm).
-Removing the DKMS patch does not uninstall the 64 KiB kernel or revert swap
-and boot settings. Those are covered separately below. The temporary-load
-procedure applies only to the manual build and load.
+[← README](../README.md) · [Installation](installation.md) · [Status](usage.md)
 
 ## Return to the packaged driver
 
-The [manual load procedure](usage.md#roll-back) loads a module directly from the build
-directory. It does not replace files in `/lib/modules`, update initramfs or
-register with DKMS. Stop GPU clients, unload the manually loaded module and reload stock
-UVM using that procedure. Confirm all ranks agree before restarting distributed
-serving. Removing the checkout alone does not unload a running module.
+Use the procedure corresponding to the installation method:
 
-Once stock UVM is restored, the ignored `.work` build directory or the entire
-checkout can be removed. Keep locally enrolled signing keys if other modules
-use them; removing this project does not require changing Secure Boot.
+| Method | Removal |
+| --- | --- |
+| Persistent manual | [Unload, `remove-manual`, verify stock and reload](manual.md#remove) |
+| DKMS | [Unload, remove DKMS registration, verify stock and reload](dkms.md#remove-and-restore-stock-uvm) |
+| Temporary explicit load | [Unload and reload the packaged module](usage.md#roll-back) |
+
+Removing the checkout or rebooting does not uninstall a persistent override.
+Removal leaves kernels, swap, boot defaults and shared signing keys untouched.
+Verify all ranks before restarting distributed serving. Preserve the checkout
+and any incomplete-operation receipt until recovery has finished.
 
 ## Return to the stock kernel
 
 After a one-shot 64 KiB boot, stop GPU clients and reboot normally. The explicit
 stock GRUB default remains in place and the one-shot candidate selection has
-been consumed. A module loaded with `insmod` is not carried across the reboot.
+been consumed. A temporary module load is not carried across reboot. Persistent overrides
+remain installed for the 64 KiB kernel until removed separately.
 Confirm:
 
 ```sh
@@ -58,7 +57,8 @@ the console to select the known-working entry if needed.
 
 ## Update the project
 
-Restore stock UVM before updating the manual build, then update the checkout and run
+Remove the existing persistent installation using its route above, then update
+the checkout and run
 `./scripts/check`. Preserve any evidence needed from the previous build outside
 the build directory before removing that directory and building again. A new
 file on disk does not replace a module already loaded in memory.
@@ -75,8 +75,8 @@ memory measurements. Do not bypass the source checks or copy a module built
 for a different kernel. Use the packaged driver while a new combination is
 unverified.
 
-[DKMS](dkms.md) provides persistent installation for the pinned combination.
-Its build exclusions skip unvalidated kernels. Remove the DKMS override before
+Both installation methods support the pinned combination. DKMS build
+exclusions skip unvalidated kernels. Remove either override before
 NVIDIA driver updates: checks on new builds do not remove a previously installed
 binary after RM changes. Installing through DKMS does not change the stock GRUB
 default or install a global modprobe parameter.
