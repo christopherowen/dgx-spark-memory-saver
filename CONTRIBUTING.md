@@ -12,7 +12,7 @@ discovered unit test: importing them can initialize CUDA and allocate memory.
 Allocator changes require a build against the pinned source, an explanation of
 DMA mapping, ownership, synchronization and accounting, and a recorded hardware
 result or an explicit statement that hardware validation is outstanding. Follow
-the [trial procedure](docs/trial.md) in a coordinated exclusive window.
+the [validation procedure](docs/usage.md) in a coordinated exclusive window.
 
 Keep measurements under `results/` immutable. New measurements belong in a new
 directory with their own environment and workload identities. If the patch or

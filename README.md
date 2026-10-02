@@ -15,11 +15,12 @@ page size, vLLM, model weights, arithmetic or serving configuration.
 | I want to… | Guide |
 | --- | --- |
 | See how much memory it saves | [Measurements and limitations](docs/validation.md) |
-| Install the 64 KiB kernel and prerequisites | [Kernel packages, swap and trial boot](docs/kernel.md) |
+| Install the 64 KiB kernel and prerequisites | [Kernel packages, swap and boot checks](docs/kernel.md) |
 | Build and sign the patched driver manually | [Build tools and Secure Boot](docs/installation.md) |
 | Install it persistently with DKMS | [DKMS, signing, activation and removal](docs/dkms.md) |
-| Try it and verify it is working | [Temporary trial and Secure Boot](docs/trial.md) |
-| Return to the stock driver or handle updates | [Updates and removal](docs/maintenance.md) |
+| Try it and verify it is working | [Loading, verification and rollback](docs/usage.md) |
+| Uninstall the DKMS patch | [Remove and verify stock UVM](docs/dkms.md#remove-and-restore-stock-uvm) |
+| Unload the manual build or return to 4 KiB | [Updates and removal](docs/maintenance.md) |
 | Understand the allocation change | [Design and lifetime rules](docs/design.md) |
 
 ## Why it helps
@@ -39,7 +40,7 @@ Root tables and other allocation sizes retain their original allocation.
 
 ## Activation and rollback
 
-Choose the [manual trial](docs/trial.md) or [DKMS installation](docs/dkms.md).
+Choose the [manual build and load](docs/usage.md) or [DKMS installation](docs/dkms.md).
 The manual build is disabled by default and uses the explicit parameter
 `uvm_pack_sysmem_leaf_tables=1`. Installing DKMS package `0.1.0` is the persistent
 opt-in: that build enables packing by default, supports only the pinned 64 KiB
@@ -85,7 +86,7 @@ This is an independent experimental project, unaffiliated with NVIDIA.
 These hardware-free checks verify the recorded artifact hashes, Python and shell
 syntax, patch parsing, DKMS build/install guards and local documentation links.
 GitHub Actions runs the same command. They never import the CUDA test programs or access a GPU.
-Compilation on the target and the [hardware trial](docs/trial.md) are separate.
+Compilation on the target and the [hardware validation](docs/usage.md) are separate.
 See [contributing](CONTRIBUTING.md) for the evidence required when changing the
 allocator.
 

@@ -1,15 +1,17 @@
 # Updates and removal
 
-[← README](../README.md) · [Build](installation.md) · [Temporary trial](trial.md)
+[← README](../README.md) · [Build](installation.md) · [Manual build and load](usage.md)
 
 For an installed DKMS build, use [DKMS removal and restoration](dkms.md#remove-and-restore-stock-uvm).
-The temporary-load procedure below applies only to the manual trial.
+Removing the DKMS patch does not uninstall the 64 KiB kernel or revert swap
+and boot settings. Those are covered separately below. The temporary-load
+procedure applies only to the manual build and load.
 
 ## Return to the packaged driver
 
-The [temporary trial](trial.md#roll-back) loads a module directly from the build
+The [manual load procedure](usage.md#roll-back) loads a module directly from the build
 directory. It does not replace files in `/lib/modules`, update initramfs or
-register with DKMS. Stop GPU clients, unload the trial module and reload stock
+register with DKMS. Stop GPU clients, unload the manually loaded module and reload stock
 UVM using that procedure. Confirm all ranks agree before restarting distributed
 serving. Removing the checkout alone does not unload a running module.
 
@@ -19,7 +21,7 @@ use them; removing this project does not require changing Secure Boot.
 
 ## Return to the stock kernel
 
-For the manual kernel trial, stop GPU clients and reboot normally. The explicit
+After a one-shot 64 KiB boot, stop GPU clients and reboot normally. The explicit
 stock GRUB default remains in place and the one-shot candidate selection has
 been consumed. A module loaded with `insmod` is not carried across the reboot.
 Confirm:
@@ -37,7 +39,7 @@ Expect `7.0.0-1019-nvidia`, `4096` and NVIDIA `580.178.04`. If you followed the
 manual `noauto` swap procedure, run `sudo swapon /swap.img` when the original
 file is not already active. Do not activate `/swap-64k.img` on this kernel.
 Restore the original swap entry's options in `/etc/fstab` and remove the
-trial `/swap-64k.img` entry, using the saved
+64 KiB `/swap-64k.img` entry, using the saved
 `/var/lib/dgx-spark-memory-saver/preparation/fstab` as a reference. Preserve
 unrelated edits made since the backup. Run `sudo systemctl daemon-reload`.
 
@@ -56,13 +58,13 @@ the console to select the known-working entry if needed.
 
 ## Update the project
 
-Restore stock UVM between trials, then update the checkout and run
+Restore stock UVM before updating the manual build, then update the checkout and run
 `./scripts/check`. Preserve any evidence needed from the previous build outside
 the build directory before removing that directory and building again. A new
 file on disk does not replace a module already loaded in memory.
 
 Record the commit, unsigned and signed module hashes, source version, kernel,
-driver and opt-in parameter for each trial. The historical hashes identify the
+driver and opt-in parameter for each build and load. The historical hashes identify the
 original artifacts; path-sensitive builds may produce different hashes.
 
 ## Kernel and driver updates

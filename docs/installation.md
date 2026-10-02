@@ -1,6 +1,6 @@
 # Install prerequisites, build and sign
 
-[← README](../README.md) · [Kernel setup](kernel.md) · [Temporary trial](trial.md) · [Updates and removal](maintenance.md)
+[← README](../README.md) · [Kernel setup](kernel.md) · [Manual build and load](usage.md) · [Updates and removal](maintenance.md)
 
 The order is: **get this project → install the kernel and tools → build and sign
 UVM → boot the candidate kernel once → load, validate and roll back**.
@@ -41,7 +41,7 @@ needed to compile this kernel module.
 
 For persistent installation, follow [DKMS setup](dkms.md). DKMS handles module
 signing itself, using the enrolled key established below; do not manually sign
-DKMS build output. The remaining steps on this page describe the manual trial.
+DKMS build output. The remaining steps on this page describe the manual build and load.
 
 ## 2. Build the patched UVM module
 
@@ -111,7 +111,7 @@ kernel, use the firmware MOK console: **Enroll MOK → Continue → Yes**, enter
 the password, and reboot. This needs console access; SSH does not complete it.
 After reconnecting, set `DGX_MOK_DIR` again and run
 `sudo mokutil --test-key "$DGX_MOK_DIR/MOK.der"`. Verify enrollment before
-arming the 64 KiB trial boot. Enroll the signing certificate on every machine
+arming the one-shot 64 KiB boot. Enroll the signing certificate on every machine
 where you intend to load a module signed with that key; distribute the public
 certificate, not the private key.
 
@@ -136,7 +136,7 @@ require disabling Secure Boot.
 ## 4. Boot and validate
 
 Continue at [the one-shot kernel boot](kernel.md#6-boot-once-into-64-kib), then
-[load and verify the replacement UVM module](trial.md#load-and-verify).
+[load and verify the replacement UVM module](usage.md#load-and-verify).
 Copying or signing a module does not activate it. This manual route makes no
 persistent installation; [DKMS](dkms.md) provides that separate route.
 
@@ -148,5 +148,5 @@ Changing the PyTorch environment is a new test condition and should be recorded.
 
 `bpftrace` is optional and only needed for the allocation-attribution diagnostic.
 Install it with `sudo apt-get --no-remove install bpftrace` if performing that
-trace. Follow [the trace limits](trial.md#trace-separately-from-timing); do not
+trace. Follow [the trace limits](usage.md#trace-separately-from-timing); do not
 run instrumentation during throughput measurements.

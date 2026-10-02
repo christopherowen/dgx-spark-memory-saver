@@ -1,4 +1,4 @@
-# Install and trial the 64 KiB kernel
+# Install and verify the 64 KiB kernel
 
 [← README](../README.md) · [Build and sign UVM](installation.md) · [Rollback](maintenance.md)
 
@@ -10,7 +10,7 @@ upgrade recipe. CPU base page size is a kernel build choice, not a GRUB flag.
 Do this in a maintenance window, with GPU workloads stopped and console access
 available. For distributed serving, prepare and validate every node before
 restarting the ranks together. Do not let an inference service automatically
-start during the trial before the driver and memory checks are complete.
+start before the driver and memory checks are complete.
 
 ## 1. Inspect the current system and available packages
 
@@ -27,14 +27,14 @@ findmnt /
 df -h / /boot
 sudo grub-editenv list
 
-trial_kernel=7.0.0-1019-nvidia-64k
+target_kernel=7.0.0-1019-nvidia-64k
 stock_kernel=7.0.0-1019-nvidia
 kernel_package_version=7.0.0-1019.19~24.04.2
 nvidia_source_version=580.178.04-0ubuntu0.24.04.1
 sudo apt-get update
-apt-cache policy "linux-image-$trial_kernel" "linux-modules-$trial_kernel" \
-  "linux-headers-$trial_kernel" "linux-tools-$trial_kernel" \
-  "linux-modules-nvidia-580-open-$trial_kernel" nvidia-kernel-source-580-open
+apt-cache policy "linux-image-$target_kernel" "linux-modules-$target_kernel" \
+  "linux-headers-$target_kernel" "linux-tools-$target_kernel" \
+  "linux-modules-nvidia-580-open-$target_kernel" nvidia-kernel-source-580-open
 ```
 
 Require `aarch64`, the stock kernel above, `4096`, and driver `580.178.04`.
@@ -89,11 +89,11 @@ and stock kernel; unexpected driver changes or removals need resolving first.
 
 ```bash
 sudo apt-get --simulate --no-remove --no-install-recommends install \
-  "linux-image-$trial_kernel=$kernel_package_version" \
-  "linux-modules-$trial_kernel=$kernel_package_version" \
-  "linux-headers-$trial_kernel=$kernel_package_version" \
-  "linux-tools-$trial_kernel=$kernel_package_version" \
-  "linux-modules-nvidia-580-open-$trial_kernel=$kernel_package_version+1" \
+  "linux-image-$target_kernel=$kernel_package_version" \
+  "linux-modules-$target_kernel=$kernel_package_version" \
+  "linux-headers-$target_kernel=$kernel_package_version" \
+  "linux-tools-$target_kernel=$kernel_package_version" \
+  "linux-modules-nvidia-580-open-$target_kernel=$kernel_package_version+1" \
   "nvidia-kernel-source-580-open=$nvidia_source_version" \
   git build-essential gcc-13 patch coreutils kmod python3 openssl mokutil \
   dkms initramfs-tools util-linux psmisc
@@ -105,17 +105,17 @@ window. It does not reboot the machine.
 
 ```bash
 sudo env NEEDRESTART_MODE=l apt-get --no-remove --no-install-recommends install \
-  "linux-image-$trial_kernel=$kernel_package_version" \
-  "linux-modules-$trial_kernel=$kernel_package_version" \
-  "linux-headers-$trial_kernel=$kernel_package_version" \
-  "linux-tools-$trial_kernel=$kernel_package_version" \
-  "linux-modules-nvidia-580-open-$trial_kernel=$kernel_package_version+1" \
+  "linux-image-$target_kernel=$kernel_package_version" \
+  "linux-modules-$target_kernel=$kernel_package_version" \
+  "linux-headers-$target_kernel=$kernel_package_version" \
+  "linux-tools-$target_kernel=$kernel_package_version" \
+  "linux-modules-nvidia-580-open-$target_kernel=$kernel_package_version+1" \
   "nvidia-kernel-source-580-open=$nvidia_source_version" \
   git build-essential gcc-13 patch coreutils kmod python3 openssl mokutil \
   dkms initramfs-tools util-linux psmisc
-sudo dkms autoinstall -k "$trial_kernel"
-sudo depmod "$trial_kernel"
-sudo update-initramfs -u -k "$trial_kernel"
+sudo dkms autoinstall -k "$target_kernel"
+sudo depmod "$target_kernel"
+sudo update-initramfs -u -k "$target_kernel"
 sudo update-grub
 ```
 
@@ -129,17 +129,17 @@ verify its DKMS build and enrolled signing certificate for the new kernel too.
 Resolve failed DKMS builds before proceeding.
 
 ```bash
-dpkg-query -W "linux-image-$trial_kernel" "linux-modules-$trial_kernel" \
-  "linux-headers-$trial_kernel" "linux-tools-$trial_kernel" \
-  "linux-modules-nvidia-580-open-$trial_kernel" nvidia-kernel-source-580-open
-grep -x 'CONFIG_ARM64_64K_PAGES=y' "/boot/config-$trial_kernel"
-test -s "/boot/vmlinuz-$trial_kernel"
-lsinitramfs "/boot/initrd.img-$trial_kernel" | less
-modinfo -k "$trial_kernel" -F version nvidia
-modinfo -k "$trial_kernel" -F vermagic nvidia_uvm
-modinfo -k "$trial_kernel" -F signer nvidia_uvm
-modinfo -k "$trial_kernel" -F vermagic mlx5_core
-modinfo -k "$trial_kernel" -F vermagic mlx5_ib
+dpkg-query -W "linux-image-$target_kernel" "linux-modules-$target_kernel" \
+  "linux-headers-$target_kernel" "linux-tools-$target_kernel" \
+  "linux-modules-nvidia-580-open-$target_kernel" nvidia-kernel-source-580-open
+grep -x 'CONFIG_ARM64_64K_PAGES=y' "/boot/config-$target_kernel"
+test -s "/boot/vmlinuz-$target_kernel"
+lsinitramfs "/boot/initrd.img-$target_kernel" | less
+modinfo -k "$target_kernel" -F version nvidia
+modinfo -k "$target_kernel" -F vermagic nvidia_uvm
+modinfo -k "$target_kernel" -F signer nvidia_uvm
+modinfo -k "$target_kernel" -F vermagic mlx5_core
+modinfo -k "$target_kernel" -F vermagic mlx5_ib
 dkms status
 sudo grub-script-check /boot/grub/grub.cfg
 ```
@@ -184,19 +184,19 @@ other applicable options. Add the following **also with `noauto`**:
 ```
 
 Run `sudo systemctl daemon-reload`. Neither edit disables currently active swap;
-this guide activates only the matching file manually after each trial boot.
+this guide activates only the matching file manually after each one-shot boot.
 Do not run `swapon /swap-64k.img` on the 4 KiB kernel or reformat the original
 file. The separate-file approach follows the
 [swap page-size requirement](https://man7.org/linux/man-pages/man8/mkswap.8.html).
 The deployment's automatic page-aware swap service is not required for this
-manual trial; retain it if your operator already manages swap that way.
+manual setup; retain it if your operator already manages swap that way.
 
-## 5. Build and sign before the trial reboot
+## 5. Build and sign before rebooting into 64 KiB
 
 Follow [build and signing](installation.md#2-build-the-patched-uvm-module).
 Compilation can happen while still running the stock 4 KiB kernel. If a new
 signing key needs enrollment, complete its firmware-console enrollment and
-verify it on the stock kernel before starting the 64 KiB trial.
+verify it on the stock kernel before booting into 64 KiB.
 
 ## 6. Boot once into 64 KiB
 
@@ -206,17 +206,17 @@ entry for one boot while retaining the stock normal default. Set these again
 if you opened a new shell after key enrollment:
 
 ```bash
-trial_kernel=7.0.0-1019-nvidia-64k
+target_kernel=7.0.0-1019-nvidia-64k
 stock_kernel=7.0.0-1019-nvidia
 (
   set -euo pipefail
   root_uuid=$(findmnt -n -o UUID /)
   test -n "$root_uuid"
   stock_entry="gnulinux-advanced-$root_uuid>gnulinux-$stock_kernel-advanced-$root_uuid"
-  trial_entry="gnulinux-advanced-$root_uuid>gnulinux-$trial_kernel-advanced-$root_uuid"
+  target_entry="gnulinux-advanced-$root_uuid>gnulinux-$target_kernel-advanced-$root_uuid"
   sudo grep -F "set default=\"$stock_entry\"" /boot/grub/grub.cfg
-  sudo grep -F "'gnulinux-$trial_kernel-advanced-$root_uuid'" /boot/grub/grub.cfg
-  sudo grub-reboot "$trial_entry"
+  sudo grep -F "'gnulinux-$target_kernel-advanced-$root_uuid'" /boot/grub/grub.cfg
+  sudo grub-reboot "$target_entry"
   sudo grub-editenv list
 )
 ```
@@ -224,7 +224,7 @@ stock_kernel=7.0.0-1019-nvidia
 Require `next_entry` to match the candidate, then `sudo reboot`. To cancel
 before reboot, use `sudo grub-editenv /boot/grub/grubenv unset next_entry`.
 A one-shot entry is not a watchdog: a hung host still needs console/power
-recovery. Do not make 64 KiB the persistent default as part of this trial.
+recovery. Do not make 64 KiB the persistent default before completing the boot and driver checks.
 
 ## 7. Verify the boot, then load the patched UVM module
 
@@ -245,7 +245,7 @@ Require `7.0.0-1019-nvidia-64k`, `65536`, driver `580.178.04`, and working
 network/fan/CPU governor services. On the tested hosts the CPU governors read
 `performance`. Skip manual `swapon` if the correct file is already active.
 The package installation initially gives you **stock UVM on a 64 KiB kernel**;
-packing is not active until you follow [manual load and verify](trial.md#load-and-verify)
+packing is not active until you follow [manual load and verify](usage.md#load-and-verify)
 or install and verify the [DKMS build](dkms.md#5-load-and-verify).
 
 ### Reproduce the measured memory profile
@@ -268,5 +268,5 @@ matched and recorded if benchmarking. These commands are transient and do not
 install a persistent sysctl policy. A reserve appropriate to this measured host
 is not a universal recommendation for other machines or workloads.
 
-Proceed to [driver validation](trial.md#validate). For rollback, follow
+Proceed to [driver validation](usage.md#validate). For rollback, follow
 [return to the stock kernel](maintenance.md#return-to-the-stock-kernel).

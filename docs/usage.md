@@ -1,8 +1,9 @@
-# Temporary driver trial
+# Load, verify and unload the manual build
 
 First complete [kernel and prerequisite setup](kernel.md) and
 [build and signing](installation.md). These are operator instructions, not an
-automatic installation procedure.
+automatic installation procedure. Loading with `insmod` lasts until the module
+is unloaded or the machine reboots; use DKMS for persistent installation.
 These commands assume the manual route, with no memory-saver DKMS override
 installed. If using DKMS, follow [DKMS load/removal](dkms.md) instead.
 Coordinate an exclusive window and stop all GPU clients before changing UVM.
@@ -94,14 +95,14 @@ valid throughput measurement.
 
 ## Roll back
 
-After stopping GPU clients, unload trial UVM and reload the packaged module:
+After stopping GPU clients, unload the manually loaded UVM and reload the packaged module:
 
 ```sh
 sudo modprobe -r nvidia_uvm
 sudo modprobe nvidia_uvm
 ```
 
-This works because the trial never installs over packaged modules or changes
+This works because the manual procedure never installs over packaged modules or changes
 modprobe configuration. A normal reboot also returns to the configured stock
 boot path; the recorded fleet retained 4 KiB as its normal default.
 Verify that the custom parameter is absent and that all nodes agree before
