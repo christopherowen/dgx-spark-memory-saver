@@ -5,7 +5,7 @@
  
      NvU64 size;
 +
-+    // Non-NULL only for opt-in packed sysmem leaf tables.
++    // Backing page of a packed leaf table; NULL for unpacked allocations.
 +    struct uvm_mmu_sysmem_pool_page *sysmem_pool_page;
  
      union
@@ -34,9 +34,9 @@
  MODULE_PARM_DESC(uvm_page_table_location,
                  "Set the location for UVM-allocated page tables. Choices are: vid, sys.");
  
-+// Experiment: retain the original DMA mapping per CPU page, but give each
-+// small user leaf table a separate 4 KiB slot. Roots and other table sizes
-+// retain their original allocation. Disabled by default and inert on 4 KiB.
++// Pack 256-byte user leaf tables into 4 KiB slots of one 64 KiB page, which
++// keeps a single DMA mapping and the original accounting. Roots and other
++// sizes use the original allocator. Off by default; no effect on 4 KiB pages.
 +static bool uvm_pack_sysmem_leaf_tables;
 +module_param(uvm_pack_sysmem_leaf_tables, bool, S_IRUGO);
 +MODULE_PARM_DESC(uvm_pack_sysmem_leaf_tables,
@@ -77,8 +77,8 @@
 +    NV_STATUS status;
 +    void *cpu;
 +
-+    // Keep the experiment away from non-coherent DMA, fake GPUs, roots,
-+    // kernel trees and platforms with different base-page geometry.
++    // Pack only 256-byte user tables on 64 KiB pages, on a coherent integrated
++    // PCI GPU without vidmem. Everything else takes the full-page path.
 +    if (!uvm_pack_sysmem_leaf_tables || PAGE_SIZE != 65536 || size != 256 ||
 +        tree->type != UVM_PAGE_TREE_TYPE_USER || !tree->gpu->parent->pci_dev ||
 +        !tree->gpu->parent->is_integrated_gpu || tree->gpu->mem_info.size ||
@@ -102,8 +102,8 @@
 +        if (!pool)
 +            return NV_ERR_NO_MEMORY;
 +
-+        // This retains the existing memcg charge, DMA address translation,
-+        // physical TLB invalidation and mapped_cpu_pages_size accounting.
++        // The full-page path supplies the memcg charge, DMA mapping, physical
++        // TLB invalidation and mapped_cpu_pages_size accounting for all slots.
 +        status = phys_mem_allocate_sysmem_full_page(tree, PAGE_SIZE, &pool->backing);
 +        if (status != NV_OK) {
 +            kfree(pool);
@@ -121,7 +121,7 @@
 +    out->size = size;
 +    out->sysmem_pool_page = pool;
 +    out->addr.address += slot * UVM_SYSMEM_TABLE_SLOT_SIZE;
-+    // No slot shares CPU cache lines. Coherent DMA is required above.
++    // Slots never share a cache line and DMA is coherent: no flush after zeroing.
 +    cpu = kmap(out->handle.page);
 +    memset((char *)cpu + slot * UVM_SYSMEM_TABLE_SLOT_SIZE, 0, UVM_SYSMEM_TABLE_SLOT_SIZE);
 +    kunmap(out->handle.page);
@@ -140,7 +140,7 @@
 +        unsigned long slot = (ptr->addr.address - pool->backing.addr.address) / UVM_SYSMEM_TABLE_SLOT_SIZE;
 +        bool empty;
 +
-+        // The existing tracker wait above precedes reuse of any slot.
++        // The tree tracker wait above ends GPU access before any slot is reused.
 +        spin_lock(&tree->sysmem_pool_lock);
 +        UVM_ASSERT(slot < UVM_SYSMEM_TABLE_SLOT_COUNT && test_bit(slot, &pool->used));
 +        if (bitmap_full(&pool->used, UVM_SYSMEM_TABLE_SLOT_COUNT))

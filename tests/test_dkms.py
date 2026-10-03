@@ -255,8 +255,8 @@ printf '%s\\n' "$PACKAGE_NAME" "$PACKAGE_VERSION" "${#BUILT_MODULE_NAME[@]}" "${
             self.assertIn(driver.KERNEL, command)
 
     def test_dkms_default_patch_applies_to_historical_patch_content(self):
-        # Extract the introduced parameter block from the immutable experiment
-        # patch; applying the packaging patch must change just the default/comment.
+        # Extract the introduced parameter block from the allocator patch;
+        # applying the packaging patch must change just the default/comment.
         additions = '\n'.join(line[1:] for line in
                               (ROOT / 'patches/0001-pack-user-leaf-tables.patch').read_text().splitlines()
                               if line.startswith(('+', ' ')) and not line.startswith('+++')) + '\n'
@@ -267,8 +267,8 @@ printf '%s\\n' "$PACKAGE_NAME" "$PACKAGE_VERSION" "${#BUILT_MODULE_NAME[@]}" "${
             subprocess.run(['patch', '-d', tmp, '-p1', '--fuzz=0', '--batch', '-i',
                             str(ROOT / 'packaging/enable-packing.patch')], check=True,
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            expected = additions.replace('Disabled by default and inert on 4 KiB.',
-                                         'Installation opts in; inert on 4 KiB.').replace(
+            expected = additions.replace('Off by default; no effect on 4 KiB pages.',
+                                         'On by default; no effect on 4 KiB pages.').replace(
                 'static bool uvm_pack_sysmem_leaf_tables;', 'static bool uvm_pack_sysmem_leaf_tables = true;')
             self.assertEqual(source.read_text(), expected)
 

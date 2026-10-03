@@ -64,7 +64,7 @@ the build directory before removing that directory and building again. A new
 file on disk does not replace a module already loaded in memory.
 
 Record the commit, unsigned and signed module hashes, source version, kernel,
-driver and opt-in parameter for each build and load. The historical hashes identify the
+driver and `uvm_pack_sysmem_leaf_tables` value for each build and load. The historical hashes identify the
 original artifacts; path-sensitive builds may produce different hashes.
 
 ## Kernel and driver updates

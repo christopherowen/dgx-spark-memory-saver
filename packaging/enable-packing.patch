@@ -2,11 +2,11 @@
 +++ b/nvidia-uvm/uvm_mmu.c
 @@ -77,8 +77,8 @@
  
- // Experiment: retain the original DMA mapping per CPU page, but give each
- // small user leaf table a separate 4 KiB slot. Roots and other table sizes
--// retain their original allocation. Disabled by default and inert on 4 KiB.
+ // Pack 256-byte user leaf tables into 4 KiB slots of one 64 KiB page, which
+ // keeps a single DMA mapping and the original accounting. Roots and other
+-// sizes use the original allocator. Off by default; no effect on 4 KiB pages.
 -static bool uvm_pack_sysmem_leaf_tables;
-+// retain their original allocation. Installation opts in; inert on 4 KiB.
++// sizes use the original allocator. On by default; no effect on 4 KiB pages.
 +static bool uvm_pack_sysmem_leaf_tables = true;
  module_param(uvm_pack_sysmem_leaf_tables, bool, S_IRUGO);
  MODULE_PARM_DESC(uvm_pack_sysmem_leaf_tables,

@@ -1,15 +1,19 @@
 # Scope
 
-This repository owns an experimental NVIDIA UVM patch, its build instructions,
+This repository owns an NVIDIA UVM patch, its build instructions,
 standalone tests and evidence. It does not manage the serving cluster.
 
 - Preserve pinned source/package/kernel identities and existing result files.
 - Keep GPU arithmetic and unrelated driver paths outside this patch's scope.
-- Preserve the opt-in gate, DMA mapping/accounting, per-tree ownership, and wait
-  before slot reuse. Document any change to these invariants.
+- Preserve the `uvm_pack_sysmem_leaf_tables` gate, DMA mapping/accounting,
+  per-tree ownership, and wait before slot reuse. Document any change to these
+  invariants.
 - The temporary `build.sh` defaults packing off; persistent manual and DKMS
-  installation opt in through the separate default-on packaging patch. Keep the allocator patch and recorded
-  results immutable. DKMS supports only combinations registered in compatibility.json. Preserve
+  installation enable it through the separate default-on packaging patch.
+- Keep the allocator patch's code and line numbering, and recorded results,
+  immutable. Comments may be revised in place at the same line count; update
+  `patch_sha256`, the provenance `sha256`, and keep `code_sha256` unchanged.
+- DKMS supports only combinations registered in compatibility.json. Preserve
   source/package pins and qualification status per profile; do not use a
   wildcard version or patch success alone as evidence of compatibility.
 - Build in an ignored copy of the source; never edit packaged driver sources.

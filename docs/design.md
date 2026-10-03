@@ -41,9 +41,8 @@ All of these must hold:
 - The device uses coherent DMA.
 
 The historical temporary-load patch defaults the parameter off. The separate
-packaging patch used by both persistent manual and DKMS builds defaults it on:
-installation is the persistent opt-in. No
-allocator condition or synchronization changes between the two builds.
+packaging patch used by both persistent manual and DKMS builds defaults it on.
+No allocator condition or synchronization changes between the two builds.
 
 The tested hardware is GB10. The predicates are not a compatibility claim for
 other integrated GPUs. Unsupported cases retain the original allocator.

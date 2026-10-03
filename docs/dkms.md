@@ -4,9 +4,9 @@
 
 This follows fan-control's **source registration → DKMS build/sign → install →
 load/verify** workflow. It targets Ubuntu/DGX OS with DKMS 3.x (interfaces reviewed
-against 3.0.11 and the fleet's 3.4.3). Installing this package is the persistent
-opt-in: its UVM module defaults to packing eligible tables. There is no global
-modprobe option and no new boot service. CUDA clients load UVM normally.
+against 3.0.11 and the fleet's 3.4.3). Its UVM module packs eligible tables by
+default. There is no global modprobe option and no new boot service. CUDA
+clients load UVM normally.
 
 **Supported combination:** Linux aarch64, `7.0.0-1019-nvidia-64k`, NVIDIA
 `580.178.04`, source package `580.178.04-0ubuntu0.24.04.1`, and the matching

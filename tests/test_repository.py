@@ -12,6 +12,12 @@ from urllib.parse import unquote
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def code_sha256(text):
+    # Comment text removed, line structure kept: this identifies the compiled code.
+    return hashlib.sha256('\n'.join(re.sub(r'\s*//.*', '', line)
+                                    for line in text.splitlines()).encode()).hexdigest()
+
+
 class RepositoryChecks(unittest.TestCase):
     def test_profile_manifests_hashes_and_allocator_equivalence(self):
         registry = json.loads((ROOT / 'compatibility.json').read_text())
@@ -32,6 +38,18 @@ class RepositoryChecks(unittest.TestCase):
             with self.subTest(file=name):
                 self.assertEqual(hashlib.sha256((ROOT / name).read_bytes()).hexdigest(),
                                  record['sha256'])
+
+    def test_patch_comment_revisions_keep_validated_code(self):
+        for manifest_name in ['provenance.json', 'provenance-610.json']:
+            manifest = json.loads((ROOT / manifest_name).read_text())
+            records = [(name, record) for name, record in manifest['copied_files'].items()
+                       if 'code_sha256' in record]
+            if 'port' in manifest:
+                records.append((manifest['port']['patch'], manifest['port']))
+            self.assertTrue(records)
+            for name, record in records:
+                with self.subTest(manifest=manifest_name, file=name):
+                    self.assertEqual(code_sha256((ROOT / name).read_text()), record['code_sha256'])
 
     def test_json_and_python_syntax_without_execution(self):
         for path in [ROOT / 'provenance.json', *ROOT.glob('results/**/*.json')]:

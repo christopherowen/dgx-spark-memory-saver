@@ -11,7 +11,7 @@
     "580.178.04": {
       "manifest": "provenance.json",
       "patch": "patches/0001-pack-user-leaf-tables.patch",
-      "patch_sha256": "33d9906c91be277de4ad74632b0dd5b87dab24e62256dcf382008e2551740319",
+      "patch_sha256": "2333f1c1607e6564809b0786b21665a250cf36ddc63c7c4623b445b06f726cd0",
       "kernels": {
         "7.0.0-1019-nvidia-64k": {
           "module_package_version": "7.0.0-1019.19~24.04.2+1"
@@ -22,7 +22,7 @@
     "610.57.04": {
       "manifest": "provenance-610.json",
       "patch": "patches/0002-pack-user-leaf-tables-610.patch",
-      "patch_sha256": "d1d90604614b86b33c11c9366daafbe0981e84653a7e4881328734711ad2dcaf",
+      "patch_sha256": "b8bb68af3b6b8ad1c18ed2f2e521f979857d80c790da66ea90dffb21a735cf44",
       "kernels": {
         "7.0.0-1019-nvidia-64k": {
           "module_package_version": "7.0.0-1019.19~24.04.2+1"

@@ -8,7 +8,7 @@ See [compatibility and adding releases](docs/compatibility.md).
 
 **Recover memory lost to GPU page tables on a 64 KiB DGX Spark kernel.**
 
-**Experimental, opt-in driver patch.** Tested on GB10 with NVIDIA 580.178.04 and
+**In use on all four DGX Sparks in our cluster.** Tested on GB10 with NVIDIA 580.178.04 and
 Ubuntu kernel `7.0.0-1019-nvidia-64k`. The three-node serving trial recovered
 **1.78–1.86 GiB of usable memory per node compared with stock 4 KiB Linux**.
 The matched benchmarks showed **comparable decode throughput, prefill throughput
@@ -50,7 +50,7 @@ Root tables and other allocation sizes retain their original allocation.
 ## Activation and rollback
 
 Choose [manual installation](docs/manual.md) or [DKMS installation](docs/dkms.md).
-Both are persistent and enable packing by default; installation is the opt-in.
+Both are persistent and enable packing by default.
 The manual route has build/sign/install/remove helpers. DKMS package `0.4.0`
 manages its own builds and signing. Both install only UVM, check the selected
 kernel/driver profile, and refresh the target initramfs. Module loading,
@@ -100,7 +100,7 @@ its packaging checks are distinct from the earlier 0.2.0 hardware lifecycle test
 installs the tested distribution packages; the driver build script builds the
 UVM patch against their headers.
 
-This is an independent experimental project, unaffiliated with NVIDIA.
+This is an independent project, unaffiliated with NVIDIA.
 
 ## Development
 
