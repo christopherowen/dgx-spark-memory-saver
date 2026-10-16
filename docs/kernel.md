@@ -42,15 +42,12 @@ Resolve any pending `next_entry`, `prev_entry` or `initrdfail` override before
 continuing. Empty values are normal. Retain enough disk space for both kernels,
 the driver build and, if used, the separate 16 GiB swap file below.
 
-Use the machine's configured DGX OS/Ubuntu repositories. If the kernel or NVIDIA
-source versions are unavailable, stop here: do not substitute a newer package,
-add an unverified repository or download a random kernel. A new version needs a
-compatibility review. The precompiled NVIDIA module package carries a packaging
-revision after the kernel version (`+1`, `+2`, ...) that Ubuntu raises when it
-resyncs packaging; install the archive's current revision. The memory-saver
-build checks that it ships the validated modules
-([package revisions](compatibility.md#package-revisions)); the source package
-has a separate NVIDIA version.
+Use the machine's configured DGX OS/Ubuntu repositories. If the exact versions
+are unavailable, stop here: do not substitute a newer package, add an unverified
+repository or download a random kernel. A new version needs a compatibility
+review. The NVIDIA module package version is the kernel version plus a packaging
+suffix (`+1`, `+2`, ...) that Ubuntu raises on a packaging resync; any suffix is
+accepted. The source package has a separate NVIDIA version.
 
 ## 2. Preserve the working boot entry before installing
 

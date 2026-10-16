@@ -9,12 +9,10 @@ default. There is no global modprobe option and no new boot service. CUDA
 clients load UVM normally.
 
 **Supported combination:** Linux aarch64, `7.0.0-1019-nvidia-64k`, NVIDIA
-`580.178.04` from source package `580.178.04-0ubuntu0.24.04.1`, and an Ubuntu
-precompiled NVIDIA kernel-module package revision that ships the validated
-modules ([package revisions](compatibility.md#package-revisions)). Other
-kernels, including the 4 KiB fallback, are excluded. `AUTOINSTALL=yes` supports
-this combination; future kernel/driver versions require an updated, validated
-compatibility profile.
+`580.178.04`, source package `580.178.04-0ubuntu0.24.04.1`, and the matching
+precompiled NVIDIA kernel-module package. Other kernels, including the 4 KiB
+fallback, are excluded. `AUTOINSTALL=yes` supports this exact combination;
+future kernel/driver versions require an updated, validated compatibility pin.
 
 DKMS packages only `nvidia-uvm`. The build also compiles RM to resolve its symbols,
 but DKMS does not install that RM output. The packaged NVIDIA RM, modeset, DRM
@@ -25,7 +23,7 @@ alongside this replacement: two DKMS packages must not own the same UVM module.
 
 Complete [kernel and package setup](kernel.md) through the preboot checks.
 Run `./scripts/check` in this checkout. The host must have the pinned headers,
-the validated NVIDIA source and precompiled modules, Python 3, GCC 13 and the other listed
+NVIDIA source and precompiled modules, Python 3, GCC 13 and the other listed
 build tools. Then check:
 
 ```sh
@@ -186,8 +184,8 @@ the stock module does not recognize it.
 
 ## Updates
 
-To migrate from `0.1.0`, `0.2.0`, the experimental `0.3.0` or `0.4.0`, remove
-that exact registration using its recorded version,
+To migrate from `0.1.0`, `0.2.0`, the experimental `0.3.0` or `0.4.0`, remove that exact
+registration using its recorded version,
 verify stock restoration, and then register `0.4.1`. Do not overwrite the old
 registered source or delete DKMS backup directories.
 
@@ -273,10 +271,8 @@ Require:
 - NVIDIA version `580.178.04`.
 - No `uvm_pack_sysmem_leaf_tables` parameter in the parameter list.
 
-If DKMS removal succeeded but the packaged file was not restored, reinstall the
-precompiled package before loading anything. The archive offers only its current
-revision; `./scripts/driver-build check` confirms that it ships the validated
-modules:
+If DKMS removal succeeded but the packaged file was not restored, repair the
+exact precompiled package before loading anything:
 
 ```bash
 (
@@ -330,9 +326,6 @@ so there is none to disable or delete.
 The allocator patches retain their recorded GPU validation. Version 0.4.0
 packaging has hardware-free orchestration tests and exact packaged-source patch
 checks for R580 and R610; its own on-device install/remove cycle has not been run.
-Version 0.4.1 identifies packages by content instead of revision; its read-only
-`driver-build check` passed on two DGX Sparks with module package `+2`
-([identity record](../results/2026-10-16-package-revisions/identities.json)).
 The hardware lifecycle evidence below belongs to version 0.2.0. DKMS adds a separate
 two-line source change (comment and default value), build orchestration, signing
 through DKMS, and install/remove hooks. The repository tests exercise rejection

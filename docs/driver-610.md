@@ -45,8 +45,7 @@ Ubuntu precompiled-module metapackages
 `linux-modules-nvidia-610-open-nvidia-hwe-24.04` and
 `linux-modules-nvidia-610-open-nvidia-64k-hwe-24.04` at
 `7.0.0-1019.19~24.04.2+1`, plus `nvidia-driver-610-open` and the source package
-at `610.57.04-0ubuntu0.24.04.3`, or later revisions that ship the same content
-(the builder checks it; see [package revisions](compatibility.md#package-revisions)). The metapackages provide the NVIDIA DKMS
+at `610.57.04-0ubuntu0.24.04.3`. The metapackages provide the NVIDIA DKMS
 dependency without registering NVIDIA's separate DKMS build. Simulate the
 transaction first and retain firmware needed by the previous driver.
 

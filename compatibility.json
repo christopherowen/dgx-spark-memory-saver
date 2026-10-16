@@ -12,22 +12,9 @@
       "manifest": "provenance.json",
       "patch": "patches/0001-pack-user-leaf-tables.patch",
       "patch_sha256": "2333f1c1607e6564809b0786b21665a250cf36ddc63c7c4623b445b06f726cd0",
-      "source_package_versions": [
-        "580.178.04-0ubuntu0.24.04.1"
-      ],
       "kernels": {
         "7.0.0-1019-nvidia-64k": {
-          "module_package_versions": [
-            "7.0.0-1019.19~24.04.2+1",
-            "7.0.0-1019.19~24.04.2+2"
-          ],
-          "module_srcversions": {
-            "nvidia": "B9F87D2C66AEAE721A6DFF6",
-            "nvidia-drm": "977A49B4AC454086EA07CAD",
-            "nvidia-modeset": "79CC185A1D9735C3128FD88",
-            "nvidia-peermem": "05E8CF2F419E46C7D3D974E",
-            "nvidia-uvm": "09F2A78862D06017E9324B6"
-          }
+          "kernel_package_version": "7.0.0-1019.19~24.04.2"
         }
       },
       "qualification": "validated"
@@ -36,21 +23,9 @@
       "manifest": "provenance-610.json",
       "patch": "patches/0002-pack-user-leaf-tables-610.patch",
       "patch_sha256": "b8bb68af3b6b8ad1c18ed2f2e521f979857d80c790da66ea90dffb21a735cf44",
-      "source_package_versions": [
-        "610.57.04-0ubuntu0.24.04.3"
-      ],
       "kernels": {
         "7.0.0-1019-nvidia-64k": {
-          "module_package_versions": [
-            "7.0.0-1019.19~24.04.2+1"
-          ],
-          "module_srcversions": {
-            "nvidia": "E3EB66762FE230BFDEFB25D",
-            "nvidia-drm": "4E0736D3CFF454957152517",
-            "nvidia-modeset": "5294D15459B74F85F379205",
-            "nvidia-peermem": "05E8CF2F419E46C7D3D974E",
-            "nvidia-uvm": "625DCD62A2DB1AC8DCCA0FF"
-          }
+          "kernel_package_version": "7.0.0-1019.19~24.04.2"
         }
       },
       "qualification": "conditional",
