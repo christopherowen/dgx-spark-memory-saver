@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-16",
+  "purpose": "Content identities for 0.4.1: the validated packages, and Ubuntu's +2 resync of the R580 module package.",
+  "method": "tree_sha256 and module_srcversions from scripts/driver_build.py. Validated packages were extracted with dpkg-deb -x from the copies kept since the 2026-10-02 qualification; nothing was installed, built or loaded.",
+  "validated_packages": [
+    {
+      "package": "nvidia-kernel-source-580-open",
+      "version": "580.178.04-0ubuntu0.24.04.1",
+      "tree_sha256": "c3830b439b80f08da07f8cb5f75d3d34ce6103c053bb3f5516bda27efb4ffd9d"
+    },
+    {
+      "package": "nvidia-kernel-source-610-open",
+      "version": "610.57.04-0ubuntu0.24.04.3",
+      "tree_sha256": "161b46ae5c787779eb42d0fe2d09f29f795c53c5249f02091dd96e86f7841104"
+    },
+    {
+      "package": "linux-modules-nvidia-580-open-7.0.0-1019-nvidia-64k",
+      "version": "7.0.0-1019.19~24.04.2+1",
+      "module_srcversions": {
+        "nvidia": "B9F87D2C66AEAE721A6DFF6",
+        "nvidia-drm": "977A49B4AC454086EA07CAD",
+        "nvidia-modeset": "79CC185A1D9735C3128FD88",
+        "nvidia-peermem": "05E8CF2F419E46C7D3D974E",
+        "nvidia-uvm": "09F2A78862D06017E9324B6"
+      }
+    },
+    {
+      "package": "linux-modules-nvidia-610-open-7.0.0-1019-nvidia-64k",
+      "version": "7.0.0-1019.19~24.04.2+1",
+      "module_srcversions": {
+        "nvidia": "E3EB66762FE230BFDEFB25D",
+        "nvidia-drm": "4E0736D3CFF454957152517",
+        "nvidia-modeset": "5294D15459B74F85F379205",
+        "nvidia-peermem": "05E8CF2F419E46C7D3D974E",
+        "nvidia-uvm": "625DCD62A2DB1AC8DCCA0FF"
+      }
+    }
+  ],
+  "installed_hosts": [
+    {
+      "host": "dgx1",
+      "nvidia-kernel-source-580-open": "580.178.04-0ubuntu0.24.04.1",
+      "tree_sha256": "c3830b439b80f08da07f8cb5f75d3d34ce6103c053bb3f5516bda27efb4ffd9d",
+      "linux-modules-nvidia-580-open-7.0.0-1019-nvidia-64k": "7.0.0-1019.19~24.04.2+2",
+      "module_srcversions": {
+        "nvidia": "B9F87D2C66AEAE721A6DFF6",
+        "nvidia-drm": "977A49B4AC454086EA07CAD",
+        "nvidia-modeset": "79CC185A1D9735C3128FD88",
+        "nvidia-peermem": "05E8CF2F419E46C7D3D974E",
+        "nvidia-uvm": "09F2A78862D06017E9324B6"
+      },
+      "driver_build_check": {
+        "exit": 0,
+        "driver": "580.178.04",
+        "qualification": "validated"
+      }
+    },
+    {
+      "host": "dgx4",
+      "nvidia-kernel-source-580-open": "580.178.04-0ubuntu0.24.04.1",
+      "linux-modules-nvidia-580-open-7.0.0-1019-nvidia-64k": "7.0.0-1019.19~24.04.2+2",
+      "driver_build_check": {
+        "exit": 0,
+        "driver": "580.178.04",
+        "qualification": "validated"
+      }
+    }
+  ],
+  "plus2_changelog": "Packaging resync (LP: #1786013): debian/dkms-versions updated from kernel-versions. The five modules keep the +1 srcversions.",
+  "archive_2026-10-16": {
+    "linux-modules-nvidia-580-open-7.0.0-1019-nvidia-64k": [
+      "7.0.0-1019.19~24.04.2+2"
+    ],
+    "nvidia-kernel-source-580-open (Ubuntu)": [
+      "580.178.04-0ubuntu0.24.04.1"
+    ],
+    "linux-modules-nvidia-610-open-7.0.0-1019-nvidia-64k": [
+      "7.0.0-1019.19~24.04.2+1"
+    ],
+    "nvidia-kernel-source-610-open": [
+      "610.57.04-0ubuntu0.24.04.4"
+    ]
+  },
+  "not_checked": "nvidia-kernel-source-610-open 610.57.04-0ubuntu0.24.04.4 (the archive's current revision) was not downloaded; the builder accepts it only if its tree matches."
+}
