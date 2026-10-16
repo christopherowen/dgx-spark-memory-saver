@@ -52,7 +52,7 @@ Retain a known-working stock kernel and recovery access.
 
 ### Build and identity
 
-Run `scripts/build.sh` as an ordinary user. It requires the validated NVIDIA source
+Run `scripts/build.sh` as an ordinary user. It requires the pinned source package
 and staged 64 KiB headers, but does not require the candidate kernel to be running
 while compiling. Before loading, verify the running kernel, module and source:
 

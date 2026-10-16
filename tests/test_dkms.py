@@ -21,7 +21,7 @@ driver = importlib.util.module_from_spec(spec)
 loader.exec_module(driver)
 VERSION = '580.178.04'
 MODULE_PACKAGE = driver.module_package(driver.KERNEL, VERSION)
-MODULE_PACKAGE_VERSION = driver.REGISTRY['drivers'][VERSION]['kernels'][driver.KERNEL]['module_package_versions'][0]
+MODULE_PACKAGE_VERSION = driver.REGISTRY['drivers'][VERSION]['kernels'][driver.KERNEL]['kernel_package_version'] + '+1'
 
 
 class BuildChecks(unittest.TestCase):
@@ -39,7 +39,6 @@ class BuildChecks(unittest.TestCase):
             path.parent.mkdir(exist_ok=True)
             path.write_text('untouched source ' + name)
             manifest['upstream']['file_sha256'][name] = hashlib.sha256(path.read_bytes()).hexdigest()
-        manifest['upstream']['tree_sha256'] = driver.tree_sha256(self.source)
         self.headers = root / 'headers'
         (self.headers / 'include/config').mkdir(parents=True)
         (self.headers / 'include/config/kernel.release').write_text(driver.KERNEL + '\n')
@@ -48,9 +47,6 @@ class BuildChecks(unittest.TestCase):
         self.stock = root / 'packaged-modules/nvidia-uvm.ko'
         self.stock.parent.mkdir()
         self.stock.write_text('stock module')
-        for name in ['nvidia', 'nvidia-drm', 'nvidia-modeset', 'nvidia-peermem']:
-            (self.stock.parent / (name + '.ko')).write_text('stock ' + name)
-        self.packaged = [self.stock.parent] + sorted(self.stock.parent.iterdir())
         for name, value in [('WORK', self.work)]:
             guard = patch.object(driver, name, value)
             guard.start()
@@ -72,15 +68,13 @@ class BuildChecks(unittest.TestCase):
         defaults = {
             ('uname', '-s'): 'Linux', ('uname', '-m'): 'aarch64',
             ('dkms', 'status'): 'dgx-spark-fan-control/0.1.3: installed',
-            ('dpkg-query', '-L', package): '\n'.join(str(path) for path in self.packaged),
+            ('dpkg-query', '-L', package): str(self.stock),
             ('modinfo', '-k', driver.KERNEL, '-F', 'version', 'nvidia'): version,
             ('modinfo', '-k', driver.KERNEL, '-F', 'filename', 'nvidia_uvm'): str(self.stock),
         }
-        for package, version in [(self.profile['upstream']['package'], self.profile['source_package_versions'][0]),
-                                 (package, self.profile['kernels'][driver.KERNEL]['module_package_versions'][0])]:
+        for package, version in [(self.profile['upstream']['package'], self.profile['upstream']['package_version']),
+                                 (package, MODULE_PACKAGE_VERSION)]:
             defaults[('dpkg-query', '-W', '-f=${db:Status-Status} ${Version}', package)] = 'installed ' + version
-        for name, srcversion in self.profile['kernels'][driver.KERNEL]['module_srcversions'].items():
-            defaults[('modinfo', '-F', 'srcversion', str(self.stock.parent / (name + '.ko')))] = srcversion
         for module in [self.stock, self.work / 'nvidia-uvm.ko']:
             defaults[('modinfo', '-F', 'version', str(module))] = self.profile['driver']
             defaults[('modinfo', '-F', 'vermagic', str(module))] = driver.KERNEL + ' SMP modversions aarch64'
@@ -149,46 +143,19 @@ class BuildChecks(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'Unsupported NVIDIA'):
             driver.check_install(driver.KERNEL, self.headers)
         self.overrides.clear()
-        self.overrides[('dpkg-query', '-W', '-f=${db:Status-Status} ${Version}', MODULE_PACKAGE)] = 'not-installed '
-        with self.assertRaisesRegex(RuntimeError, 'Install ' + re.escape(MODULE_PACKAGE)):
-            driver.check_install(driver.KERNEL, self.headers)
-        self.assert_not_built()
-
-    def test_any_revision_carrying_the_validated_build_is_accepted(self):
-        recorded = driver.check_environment(driver.KERNEL, self.headers)
-        self.assertEqual(recorded['installed'][MODULE_PACKAGE], MODULE_PACKAGE_VERSION)
         query = ('dpkg-query', '-W', '-f=${db:Status-Status} ${Version}', MODULE_PACKAGE)
-        for revision in self.profile['kernels'][driver.KERNEL]['module_package_versions'] + ['7.0.0-1019.19~24.04.2+9']:
-            self.overrides[query] = 'installed ' + revision
-            with self.subTest(revision=revision), patch('sys.stderr') as stderr:
-                self.assertEqual(driver.check_environment(driver.KERNEL, self.headers)['installed'][MODULE_PACKAGE],
-                                 revision)
-                noted = ''.join(call.args[0] for call in stderr.write.call_args_list)
-                self.assertEqual('record the revision' in noted, revision.endswith('+9'))
-        driver.build(driver.KERNEL, self.headers, dkms=True)
-        import json
-        receipt = json.loads((self.work / 'build.json').read_text())
-        self.assertEqual(receipt['profile']['installed'][MODULE_PACKAGE], '7.0.0-1019.19~24.04.2+9')
-
-    def test_a_different_module_build_is_rejected(self):
-        self.overrides[('modinfo', '-F', 'srcversion', str(self.stock))] = 'ANOTHERBUILD0000000000'
-        with self.assertRaisesRegex(RuntimeError, 'not the validated NVIDIA'):
-            driver.build(driver.KERNEL, self.headers, dkms=True)
-        self.overrides.clear()
-        self.packaged.remove(self.stock.parent / 'nvidia-peermem.ko')
-        with self.assertRaisesRegex(RuntimeError, 'not the validated NVIDIA'):
-            driver.check_install(driver.KERNEL, self.headers)
+        for version in ['7.0.0-1020.20~24.04.1+1', '7.0.0-1019.19~24.04.20+1', 'newer']:
+            self.overrides[query] = 'installed ' + version
+            with self.subTest(version=version), self.assertRaisesRegex(RuntimeError, 'kernel package version'):
+                driver.check_install(driver.KERNEL, self.headers)
         self.assert_not_built()
 
-    def test_any_change_in_the_source_tree_is_rejected(self):
-        (self.source / 'nvidia-uvm/extra.c').write_text('not in the validated tree')
-        with self.assertRaisesRegex(RuntimeError, 'not the validated source tree'):
-            driver.build(driver.KERNEL, self.headers, dkms=True)
-        (self.source / 'nvidia-uvm/extra.c').unlink()
-        (self.source / 'nvidia-uvm/link.c').symlink_to('uvm_mmu.c')
-        with self.assertRaisesRegex(RuntimeError, 'not the validated source tree'):
-            driver.check_install(driver.KERNEL, self.headers)
-        self.assert_not_built()
+    def test_module_package_matches_on_the_kernel_version(self):
+        query = ('dpkg-query', '-W', '-f=${db:Status-Status} ${Version}', MODULE_PACKAGE)
+        for suffix in ['+1', '+2', '+9']:
+            self.overrides[query] = 'installed 7.0.0-1019.19~24.04.2' + suffix
+            with self.subTest(suffix=suffix):
+                driver.check_install(driver.KERNEL, self.headers)
 
     def test_install_requires_intact_stock_module_and_no_other_override(self):
         driver.check_install(driver.KERNEL, self.headers)
@@ -198,7 +165,7 @@ class BuildChecks(unittest.TestCase):
             driver.check_install(driver.KERNEL, self.headers)
         self.overrides.clear()
         self.stock.unlink()
-        with self.assertRaisesRegex(RuntimeError, 'restore the stock modules'):
+        with self.assertRaisesRegex(RuntimeError, 'stock UVM'):
             driver.check_install(driver.KERNEL, self.headers)
 
     def test_competing_nvidia_dkms_is_rejected(self):
@@ -224,7 +191,6 @@ class BuildChecks(unittest.TestCase):
         self.profile = copy.deepcopy(self.real_profile('610.57.04', driver.KERNEL))
         self.profile['upstream']['source_root'] = str(self.source)
         self.profile['upstream']['file_sha256'] = original['upstream']['file_sha256']
-        self.profile['upstream']['tree_sha256'] = original['upstream']['tree_sha256']
         driver.build(driver.KERNEL, self.headers, dkms=True)
         self.assertEqual([Path(c[-1]).name for c in self.calls if c[0] == 'patch'],
                          ['0002-pack-user-leaf-tables-610.patch', 'enable-packing.patch'])

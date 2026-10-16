@@ -26,9 +26,12 @@ install or verify its separate RM correction; see [the R610 evidence](driver-610
 
 Build, build-sign, manual install/remove and status accept `--kernel RELEASE`.
 Only registered kernels are accepted for build/install. Headers must match that
-release and enable ARM64 64 KiB pages. The NVIDIA source tree and patched-file
-hashes, the precompiled modules' srcversions, the patch hash, module driver
-version and vermagic are checked. Unknown releases stop with a compatibility error. DKMS generates its
+release and enable ARM64 64 KiB pages. The exact source package version, the
+precompiled-module package's kernel version, patched-file hashes, patch hash,
+module driver version and vermagic are checked. The module package's packaging
+suffix (`+1`, `+2`, ...) is not pinned: Ubuntu raises it on a packaging resync.
+R580's `+2` ships the same modules as `+1`
+([record](../results/2026-10-16-package-revisions/identities.json)). Unknown releases stop with a compatibility error. DKMS generates its
 kernel exclusion from the same table and checks the actual cached binary before
 installing, including compressed artifacts.
 
@@ -40,17 +43,14 @@ resolve symbols. No allocator implementation is duplicated in Python or DKMS.
 
 ## Add a release
 
-1. Record the NVIDIA source package and stock module package revisions. Add a
-   source manifest with hashes for both patched files and the whole source tree
-   (`tree_sha256`), and record the srcversion of every module in the stock
-   module package. Keep historical manifests intact.
+1. Record the exact NVIDIA source package and stock module package. Add a source
+   manifest with hashes for both patched files. Keep historical manifests intact.
 2. Review the allocator interfaces, coherent-DMA predicate, per-tree ownership,
    tracking/wait before reuse, zeroing, unmapping and accounting. Reuse an existing
    patch when it applies with zero fuzz and preserves those invariants. If its
    context changed, add a context-only variant and check its code edits against
    the original. Patch applicability alone does not establish compatibility.
-3. Add the driver entry with its source package revisions and, per kernel, its
-   module package revisions and module srcversions. For a new kernel,
+3. Add the driver entry and its per-kernel kernel package version. For a new kernel,
    add the kernel/compiler entry and the reviewed driver/kernel pairing. DKMS
    exclusion and target selection update from this data; no Python release
    constants or second build script are needed.
@@ -60,24 +60,6 @@ resolve symbols. No allocator implementation is duplicated in Python or DKMS.
    replay, serving, removal and reboot. Record known external driver requirements.
 5. Set qualification from the evidence and bump the project package version for
    a release. Preserve old registered DKMS source until it has been removed.
-
-## Package revisions
-
-Ubuntu republishes the precompiled NVIDIA module packages when it resyncs kernel
-packaging, and the archive keeps only the newest revision. Since 0.4.1 a profile
-therefore identifies validated content rather than a Debian revision: the
-SHA-256 of the whole packaged NVIDIA source tree (`tree_sha256` in the source
-manifest) and the `srcversion` of every module the precompiled package ships
-(`module_srcversions`). An installed revision with that content is the validated
-driver. A revision whose source tree or any module differs is refused until it
-has been reviewed.
-
-Each profile lists the revisions known to carry its content
-(`source_package_versions`, `module_package_versions`). `driver-build check`
-reports the installed revisions and notes one that is not listed yet; add it to
-the profile. R580's module package `7.0.0-1019.19~24.04.2+2`, a packaging
-resync that replaced `+1` in the archive, ships the same five modules
-([identity record](../results/2026-10-16-package-revisions/identities.json)).
 
 ## Driver upgrades and removal
 

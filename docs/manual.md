@@ -99,7 +99,7 @@ absence of the packing parameter. Test CUDA/serving before resuming use.
 
 If removal or initramfs refresh fails, the receipt remains for recovery. Fix the
 reported problem and rerun `remove-manual`; it can finish even if the override
-was already deleted. If the packaged file itself is missing, use the
+was already deleted. If the packaged file itself is missing, use the exact
 package repair command in [stock restoration](dkms.md#4-verify-the-on-disk-driver-has-returned-to-stock),
 then rerun removal. Do not edit receipt hashes or delete its state to suppress
 an ownership error.
