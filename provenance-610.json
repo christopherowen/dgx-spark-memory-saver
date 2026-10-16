@@ -9,7 +9,8 @@
     "file_sha256": {
       "nvidia-uvm/uvm_mmu.c": "b8572dc2e4dcefeec246bdc97c4a3f0f2537bd3b75ac4b7e163c4b20d1b6caff",
       "nvidia-uvm/uvm_mmu.h": "3783bdd29f20c0dc84bbfac27bdfca772b420625e1b452d29e30c7de98ac4ad6"
-    }
+    },
+    "tree_sha256": "161b46ae5c787779eb42d0fe2d09f29f795c53c5249f02091dd96e86f7841104"
   },
   "tested_kernel": "7.0.0-1019-nvidia-64k",
   "origin": {

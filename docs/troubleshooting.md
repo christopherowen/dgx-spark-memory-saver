@@ -19,8 +19,10 @@ resuming a distributed service.
 
 ## Build or signing errors
 
-The source package, source file hashes, kernel release and 64 KiB header
-configuration must match the pins. Do not bypass a failed identity check. Use
+The NVIDIA source tree and patched files, the precompiled modules' srcversions,
+the kernel release and the 64 KiB header configuration must match the profile.
+A newer package revision passes when it carries the same content; a refusal means
+the content differs. Do not bypass a failed identity check. Use
 `./scripts/driver-build clean` to discard only the isolated build after saving
 needed logs; it never cleans `/usr/src/nvidia-*`.
 

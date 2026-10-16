@@ -42,11 +42,15 @@ Resolve any pending `next_entry`, `prev_entry` or `initrdfail` override before
 continuing. Empty values are normal. Retain enough disk space for both kernels,
 the driver build and, if used, the separate 16 GiB swap file below.
 
-Use the machine's configured DGX OS/Ubuntu repositories. If the exact versions
-are unavailable, stop here: do not substitute a newer package, add an unverified
-repository or download a random kernel. A new version needs a compatibility
-review. The NVIDIA module package version is the kernel version **plus `+1`**;
-the source package has a separate NVIDIA version.
+Use the machine's configured DGX OS/Ubuntu repositories. If the kernel or NVIDIA
+source versions are unavailable, stop here: do not substitute a newer package,
+add an unverified repository or download a random kernel. A new version needs a
+compatibility review. The precompiled NVIDIA module package carries a packaging
+revision after the kernel version (`+1`, `+2`, ...) that Ubuntu raises when it
+resyncs packaging; install the archive's current revision. The memory-saver
+build checks that it ships the validated modules
+([package revisions](compatibility.md#package-revisions)); the source package
+has a separate NVIDIA version.
 
 ## 2. Preserve the working boot entry before installing
 
@@ -93,7 +97,7 @@ sudo apt-get --simulate --no-remove --no-install-recommends install \
   "linux-modules-$target_kernel=$kernel_package_version" \
   "linux-headers-$target_kernel=$kernel_package_version" \
   "linux-tools-$target_kernel=$kernel_package_version" \
-  "linux-modules-nvidia-580-open-$target_kernel=$kernel_package_version+1" \
+  "linux-modules-nvidia-580-open-$target_kernel" \
   "nvidia-kernel-source-580-open=$nvidia_source_version" \
   git build-essential gcc-13 patch coreutils kmod python3 openssl mokutil \
   dkms initramfs-tools util-linux psmisc
@@ -109,7 +113,7 @@ sudo env NEEDRESTART_MODE=l apt-get --no-remove --no-install-recommends install 
   "linux-modules-$target_kernel=$kernel_package_version" \
   "linux-headers-$target_kernel=$kernel_package_version" \
   "linux-tools-$target_kernel=$kernel_package_version" \
-  "linux-modules-nvidia-580-open-$target_kernel=$kernel_package_version+1" \
+  "linux-modules-nvidia-580-open-$target_kernel" \
   "nvidia-kernel-source-580-open=$nvidia_source_version" \
   git build-essential gcc-13 patch coreutils kmod python3 openssl mokutil \
   dkms initramfs-tools util-linux psmisc

@@ -51,7 +51,7 @@ Root tables and other allocation sizes retain their original allocation.
 
 Choose [manual installation](docs/manual.md) or [DKMS installation](docs/dkms.md).
 Both are persistent and enable packing by default.
-The manual route has build/sign/install/remove helpers. DKMS package `0.4.0`
+The manual route has build/sign/install/remove helpers. DKMS package `0.4.1`
 manages its own builds and signing. Both install only UVM, check the selected
 kernel/driver profile, and refresh the target initramfs. Module loading,
 service control and boot selection remain explicit operator steps.
@@ -93,9 +93,12 @@ includes allocation readback and serving checks alongside compilation.
 
 Validated on NVIDIA DGX Spark (GB10, Linux aarch64), NVIDIA open driver
 `580.178.04-0ubuntu0.24.04.1`, and Ubuntu kernel `7.0.0-1019-nvidia-64k`.
-The build verifies the exact source package and both patched source files.
-The compatibility table also records the conditional R610 profile. Package
-0.4.0 shares build, signing, installation and status code across both profiles;
+The build verifies the validated content rather than package revisions: the
+NVIDIA source tree, both patched source files and every module in Ubuntu's
+precompiled package, so a later revision that repackages the same build is
+accepted ([package revisions](docs/compatibility.md#package-revisions)).
+The compatibility table also records the conditional R610 profile. Packages
+0.4.0 and later share build, signing, installation and status code across both profiles;
 its packaging checks are distinct from the earlier 0.2.0 hardware lifecycle tests. The [kernel setup guide](docs/kernel.md)
 installs the tested distribution packages; the driver build script builds the
 UVM patch against their headers.

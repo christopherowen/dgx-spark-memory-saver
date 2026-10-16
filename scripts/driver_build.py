@@ -4,6 +4,7 @@
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import shutil
@@ -16,6 +17,7 @@ KERNEL = REGISTRY['default_kernel']
 PACKAGE_VERSION = REGISTRY['package_version']
 WORK = ROOT / '.work' / 'uvm'
 BOOT = Path('/boot')
+MODULE_FILE = re.compile(r'\.ko(?:\.zst|\.xz|\.gz)?$')
 
 
 def run(*args, **kwargs):
@@ -59,6 +61,36 @@ def module_package(kernel, version):
     return f'linux-modules-nvidia-{version.split(".")[0]}-open-{kernel}'
 
 
+def installed_version(package):
+    status, _, version = output('dpkg-query', '-W', '-f=${db:Status-Status} ${Version}', package).partition(' ')
+    require(status == 'installed', f'Install {package}.')
+    return version
+
+
+def tree_sha256(root):
+    """Content identity of a source tree: each file's path and SHA-256, each symlink's target."""
+    root = Path(root)
+    entries = []
+    for directory, subdirectories, files in os.walk(root):
+        for name in subdirectories + files:
+            path = Path(directory) / name
+            relative = path.relative_to(root).as_posix()
+            if path.is_symlink():
+                entries.append(f'l {relative} {os.readlink(path)}\n')
+            elif path.is_file():
+                entries.append(f'f {relative} {hashlib.sha256(path.read_bytes()).hexdigest()}\n')
+    return hashlib.sha256(''.join(sorted(entries)).encode()).hexdigest()
+
+
+def module_srcversions(kernel, version):
+    """The srcversion of each module the precompiled NVIDIA package ships for the kernel."""
+    package = module_package(kernel, version)
+    paths = [Path(line) for line in output('dpkg-query', '-L', package).splitlines() if MODULE_FILE.search(line)]
+    for path in paths:
+        require(path.is_file(), f'{package} is missing {path}; reinstall it to restore the stock modules.')
+    return {MODULE_FILE.sub('', path.name): output('modinfo', '-F', 'srcversion', str(path)) for path in paths}
+
+
 def selected_profile(kernel):
     kernel_profile(kernel)
     return driver_profile(output('modinfo', '-k', kernel, '-F', 'version', 'nvidia'), kernel)
@@ -75,19 +107,31 @@ def check_environment(kernel, headers):
             'Headers must be configured for 64 KiB ARM64 pages.')
     profile = selected_profile(kernel)
     upstream = profile['upstream']
-    for package, version in [(upstream['package'], upstream['package_version']),
-                             (module_package(kernel, profile['driver']), profile['kernels'][kernel]['module_package_version'])]:
-        require(output('dpkg-query', '-W', '-f=${db:Status-Status} ${Version}', package)
-                == 'installed ' + version, f'Install the pinned package {package}={version}.')
+    pairing = profile['kernels'][kernel]
+    # Identity is the validated content, not the Debian revision: a revision that
+    # repackages the same source tree and module build is the validated driver.
+    modules = module_package(kernel, profile['driver'])
+    installed = {upstream['package']: installed_version(upstream['package']),
+                 modules: installed_version(modules)}
     source = Path(upstream['source_root'])
     for name, digest in upstream['file_sha256'].items():
         require(hashlib.sha256((source / name).read_bytes()).hexdigest() == digest,
                 f'Packaged NVIDIA source changed: {name}.')
+    require(tree_sha256(source) == upstream['tree_sha256'],
+            f'{upstream["package"]} {installed[upstream["package"]]} is not the validated source tree.')
+    require(module_srcversions(kernel, profile['driver']) == pairing['module_srcversions'],
+            f'{modules} {installed[modules]} is not the validated NVIDIA {profile["driver"]} build '
+            '(module srcversions differ). See docs/compatibility.md.')
+    recorded = {upstream['package']: profile['source_package_versions'], modules: pairing['module_package_versions']}
+    for package, version in installed.items():
+        if version not in recorded[package]:
+            print(f'Compatibility note: {package} {version} carries the validated content; '
+                  'record the revision in its profile.', file=sys.stderr)
     require(hashlib.sha256(repository_file(profile['patch']).read_bytes()).hexdigest() == profile['patch_sha256'],
             'Allocator patch differs from its reviewed profile.')
     if profile.get('caveat'):
         print('Compatibility note: ' + profile['caveat'], file=sys.stderr)
-    return profile
+    return dict(profile, installed=installed)
 
 
 def stock_module(kernel, version):
