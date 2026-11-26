@@ -8,7 +8,8 @@ against 3.0.11 and the fleet's 3.4.3). Its UVM module packs eligible tables by
 default. There is no global modprobe option and no new boot service. CUDA
 clients load UVM normally.
 
-**Supported combination:** Linux aarch64, `7.0.0-1019-nvidia-64k`, NVIDIA
+**Supported combination:** Linux aarch64, `7.0.0-1019-nvidia-64k` or
+`7.0.0-1025-nvidia-64k`, NVIDIA
 `580.178.04`, source package `580.178.04-0ubuntu0.24.04.1`, and the matching
 precompiled NVIDIA kernel-module package. Other kernels, including the 4 KiB
 fallback, are excluded. `AUTOINSTALL=yes` supports this exact combination;

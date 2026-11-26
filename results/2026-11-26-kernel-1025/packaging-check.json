@@ -1,0 +1,38 @@
+{
+  "date": "2026-11-26",
+  "commands": [
+    "./scripts/check",
+    "./scripts/driver-build check --kernel 7.0.0-1025-nvidia-64k",
+    "./scripts/driver-build build-manual --kernel 7.0.0-1025-nvidia-64k",
+    "./scripts/driver-build build-dkms --kernel 7.0.0-1025-nvidia-64k"
+  ],
+  "hardware_free_tests": "Ran 45 tests: OK",
+  "driver_build_check": {
+    "exit": 0,
+    "driver": "580.178.04",
+    "qualification": "validated",
+    "kernel_package_version": "7.0.0-1025.26~24.04.1"
+  },
+  "patch": "Both patches applied with --fuzz=0 to an ignored copy of the packaged source; gcc-13 build succeeded.",
+  "builds": {
+    "build-manual": {
+      "schema": 1,
+      "kernel": "7.0.0-1025-nvidia-64k",
+      "driver": "580.178.04",
+      "default_on": false,
+      "module_sha256": "004f1496cdab9cd3fa780d3100d414758137102ca39fbadcc2a308ebd566d62a",
+      "signed": false,
+      "package_version": "0.4.1"
+    },
+    "build-dkms": {
+      "schema": 1,
+      "kernel": "7.0.0-1025-nvidia-64k",
+      "driver": "580.178.04",
+      "default_on": true,
+      "module_sha256": "4a55e0f59329fadcda73ac7256428dfa2d9b3c9c184a03cfb547b54b0c6fc06c",
+      "signed": false,
+      "package_version": "0.4.1"
+    }
+  },
+  "note": "Built only: not signed, installed or loaded for this record."
+}

@@ -5,6 +5,9 @@
   "kernels": {
     "7.0.0-1019-nvidia-64k": {
       "compiler": "gcc-13"
+    },
+    "7.0.0-1025-nvidia-64k": {
+      "compiler": "gcc-13"
     }
   },
   "drivers": {
@@ -15,6 +18,9 @@
       "kernels": {
         "7.0.0-1019-nvidia-64k": {
           "kernel_package_version": "7.0.0-1019.19~24.04.2"
+        },
+        "7.0.0-1025-nvidia-64k": {
+          "kernel_package_version": "7.0.0-1025.26~24.04.1"
         }
       },
       "qualification": "validated"

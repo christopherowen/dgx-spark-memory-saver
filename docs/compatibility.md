@@ -10,6 +10,7 @@ selection authority.
 | NVIDIA version | Source package revision | Kernel | Qualification |
 | --- | --- | --- | --- |
 | 580.178.04 | 580.178.04-0ubuntu0.24.04.1 | 7.0.0-1019-nvidia-64k | Allocator and 0.2.0 lifecycle validated on the fleet; production choice |
+| 580.178.04 | 580.178.04-0ubuntu0.24.04.1 | 7.0.0-1025-nvidia-64k | Same stock module srcversions and patched UVM sources as the validated 1019 package; packaging checks and both builds pass ([record](../results/2026-11-26-kernel-1025/identities.json)); hardware validation: see [2026-11-26](../results/2026-11-26-kernel-1025/) |
 | 610.57.04 | 610.57.04-0ubuntu0.24.04.3 | 7.0.0-1019-nvidia-64k | Conditional: bounded GPU and serving checks with a separate RM correction and system pools disabled; stock R610 failed |
 
 Version 0.4.0 generalizes the packaging. It retains both allocator patches
